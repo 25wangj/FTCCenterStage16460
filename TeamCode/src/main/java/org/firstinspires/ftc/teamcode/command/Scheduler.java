@@ -24,12 +24,19 @@ public class Scheduler {
     public void run(boolean active) {
         double time = clock.seconds();
         for (Subsystem subsystem : subsystems.keySet()) {
-            subsystem.update(time);
+            subsystem.update(time, active);
         }
         if (active) {
             for (Listener listener : listeners) {
                 if (listener.ready()) {
                     schedule(listener.getCommand());
+                }
+            }
+            for (Command command : added) {
+                command.init();
+                commands.add(command);
+                for (Subsystem subsystem : command.getSubsystems()) {
+                    subsystems.put(subsystem, command);
                 }
             }
             for (Command command : commands) {
@@ -42,10 +49,6 @@ public class Scheduler {
                 } else {
                     command.run();
                 }
-            }
-            for (Command command : added) {
-                command.init();
-                commands.add(command);
             }
             added.clear();
         }
@@ -65,10 +68,6 @@ public class Scheduler {
         }
         added.add(command);
         cancel(toCancel.toArray(new Command[0]));
-        for (Subsystem subsystem : command.getSubsystems()) {
-            subsystems.put(subsystem, command);
-        }
-        command.init();
         return true;
     }
     public void cancel(Command... toCancel) {
@@ -105,7 +104,7 @@ public class Scheduler {
             subsystems.remove(subsystem);
         }
     }
-    public void clearSubsystems() {
+    public void unregisterAll() {
         for (Subsystem subsystem : subsystems.keySet()) {
             if (subsystems.get(subsystem) != null) {
                 throw new IllegalArgumentException("Subsystem in use by a command");

@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode.command;
 public class RaceCommand extends Command {
     private Command[] commands;
-    private boolean[] dones;
-    private boolean done;
     public RaceCommand(Command... commands) {
         for (Command command : commands) {
             for (Subsystem subsystem : command.getSubsystems()) {
@@ -13,8 +11,6 @@ public class RaceCommand extends Command {
             }
         }
         this.commands = commands;
-        dones = new boolean[commands.length];
-        done = false;
     }
     @Override
     public void init() {
@@ -30,20 +26,17 @@ public class RaceCommand extends Command {
     }
     @Override
     public void end(boolean canceled) {
-        for (int i = 0; i < commands.length; i++) {
-            if (dones[i]) {
-                commands[i].end(canceled);
-            }
+        for (Command command : commands) {
+            command.end(canceled);
         }
     }
     @Override
     public boolean done() {
-        for (int i = 0; i < commands.length; i++) {
-            if (commands[i].done()) {
-                dones[i] = true;
-                done = true;
+        for (Command command : commands) {
+            if (command.done()) {
+                return true;
             }
         }
-        return done;
+        return false;
     }
 }

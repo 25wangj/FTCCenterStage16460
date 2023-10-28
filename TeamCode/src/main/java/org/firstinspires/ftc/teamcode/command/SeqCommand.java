@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.command;
 public class SeqCommand extends Command {
     public Command[] commands;
     public int index;
-    public boolean inInit;
     public SeqCommand(Command... commands) {
         for (Command command : commands) {
             subsystems.addAll(command.getSubsystems());
@@ -17,16 +16,12 @@ public class SeqCommand extends Command {
     }
     @Override
     public void run() {
-        if (inInit) {
+        if (index != commands.length - 1 && commands[index].done()) {
+            commands[index].end(false);
+            index++;
             commands[index].init();
-            inInit = false;
         } else {
-            if (index != commands.length - 1 && commands[index].done()) {
-                index++;
-                inInit = true;
-            } else {
-                commands[index].run();
-            }
+            commands[index].run();
         }
     }
     @Override

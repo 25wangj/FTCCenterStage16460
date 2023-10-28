@@ -12,10 +12,9 @@ public class ServoTest extends CommandOpMode {
     public void initOpMode() {
         servo = hardwareMap.get(Servo.class, "test");
         pos = 0.5;
-        Subsystem servoSubsystem = t -> {
+        Subsystem servoSubsystem = (t, b) -> {
             servo.setPosition(pos);
             telemetry.addData("Position", pos);
-            telemetry.update();
         };
         scheduler.register(servoSubsystem);
         scheduler.addListener(

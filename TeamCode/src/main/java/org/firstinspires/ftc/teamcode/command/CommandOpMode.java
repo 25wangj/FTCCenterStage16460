@@ -2,19 +2,14 @@ package org.firstinspires.ftc.teamcode.command;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-
 public abstract class CommandOpMode extends LinearOpMode {
     protected Scheduler scheduler;
-    protected ElapsedTime clock;
     public abstract void initOpMode();
-    public void waitOpMode() {};
-    public void startOpMode() {};
+    public void waitOpMode() {}
+    public void startOpMode() {}
     @Override
     public void runOpMode() {
-        scheduler = new Scheduler(clock);
+        scheduler = new Scheduler();
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         initOpMode();
         while (!isStarted() && !isStopRequested()) {
@@ -22,8 +17,12 @@ public abstract class CommandOpMode extends LinearOpMode {
             scheduler.run(false);
         }
         startOpMode();
-        while(opModeIsActive()) {
+        while (opModeIsActive()) {
             scheduler.run(true);
+            telemetry.update();
         }
+    }
+    public void register(Subsystem... subsystems) {
+        scheduler.register(subsystems);
     }
 }

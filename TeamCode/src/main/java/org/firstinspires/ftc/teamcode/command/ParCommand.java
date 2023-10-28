@@ -29,7 +29,7 @@ public class ParCommand extends Command {
         for (int i = 0; i < commands.length; i++) {
             if (!dones[i]) {
                 if (justDones[i]) {
-                    commands[i].done();
+                    commands[i].end(false);
                     justDones[i] = false;
                 } else {
                     commands[i].run();

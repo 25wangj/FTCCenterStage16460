@@ -7,6 +7,6 @@ public class SymProfile extends AsymProfile {
         return new SymProfile(vm, am, t, p.getX(t), p.getV(t), xf, vf);
     }
     public static SymProfile extendSym(MotionProfile p, double vm, double am, double xf, double vf) {
-        return extendSym(p, vm, am, p.getTf(), xf, vf);
+        return extendSym(p, vm, am, p.tf, xf, vf);
     }
 }

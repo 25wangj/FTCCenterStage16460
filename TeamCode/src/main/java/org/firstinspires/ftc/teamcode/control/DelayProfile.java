@@ -24,6 +24,6 @@ public class DelayProfile extends MotionProfile {
         return new DelayProfile(ti, p.getX(ti), p.getV(ti), dt);
     }
     public static DelayProfile extendDelay(MotionProfile p, double dt) {
-        return extendDelay(p, p.getTf(), dt);
+        return extendDelay(p, p.tf, dt);
     }
 }
