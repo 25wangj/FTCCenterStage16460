@@ -11,25 +11,25 @@ public class SeqCommand extends Command {
         index = 0;
     }
     @Override
-    public void init() {
-        commands[0].init();
+    public void init(double time) {
+        commands[0].init(time);
     }
     @Override
-    public void run() {
-        if (index != commands.length - 1 && commands[index].done()) {
-            commands[index].end(false);
+    public void run(double time) {
+        if (index != commands.length - 1 && commands[index].done(time)) {
+            commands[index].end(time, false);
             index++;
-            commands[index].init();
+            commands[index].init(time);
         } else {
-            commands[index].run();
+            commands[index].run(time);
         }
     }
     @Override
-    public void end(boolean canceled) {
-        commands[index].end(canceled);
+    public void end(double time, boolean canceled) {
+        commands[index].end(time, canceled);
     }
     @Override
-    public boolean done() {
-        return index == commands.length - 1 && commands[index].done();
+    public boolean done(double time) {
+        return index == commands.length - 1 && commands[index].done(time);
     }
 }

@@ -13,19 +13,22 @@ public class AsymProfile extends MotionProfile {
         this.vi = vi;
         this.xf = xf;
         this.vf = vf;
-        sgn = (xf - xi < 0) ? -1 : 1;
+        this.vm = vm;
+        this.ai = ai;
+        this.af = af;
+        sgn = (xf < xi) ? -1 : 1;
         double v2 = Math.sqrt((2 * ai * af * abs(xf - xi) + af * vi * vi + ai * vf * vf) / (ai + af));
-        if (sgn == 1 && v2 < max(vi, vf) || -v2 > min(vi, vf)) {
+        if (sgn == 1 && v2 < max(vi, vf) || sgn == -1 && -v2 > min(vi, vf)) {
             throw new IllegalArgumentException("Impossible profile");
         }
         if (v2 > vm) {
+            tf = ti + (2 * abs(xf - xi) + (sgn * vm - vi) * (sgn * vm - vi) / ai + (sgn * vm - vf) * (sgn * vm - vf) / af) / (2 * vm);
+            t1 = ti + abs(sgn * vm - vi) / ai;
+            t2 = tf - abs(sgn * vm - vf) / af;
+        } else {
             tf = ti + abs(sgn * v2 - vi) / ai + abs(sgn * v2 - vf) / af;
             t1 = ti + abs(sgn * v2 - vi) / ai;
             t2 = t1;
-        } else {
-            tf = (2 * abs(xf - xi) + (sgn * vm - vi) * (sgn * vm - vi) / ai + (sgn * vm - vf) * (sgn * vm - vf) / af) / (2 * vm);
-            t1 = abs(sgn * vm - vi) / ai;
-            t2 = tf - abs(sgn * vm - vf) / af;
         }
     }
     @Override
@@ -63,10 +66,10 @@ public class AsymProfile extends MotionProfile {
         }
         return 0;
     }
-    public AsymProfile extendAsym(MotionProfile p, double vm, double am1, double am2, double ti, double xf, double vf) {
-        return new AsymProfile(vm, am1, am2, ti, p.getX(ti), p.getV(ti), xf, vf);
+    public static AsymProfile extendAsym(MotionProfile p, double vm, double ai, double af, double ti, double xf, double vf) {
+        return new AsymProfile(vm, ai, af, ti, p.getX(ti), p.getV(ti), xf, vf);
     }
-    public AsymProfile extendAsym(MotionProfile p, double vm, double am1, double am2, double xf, double vf) {
-        return extendAsym(p, vm, am1, am2, p.tf, xf, vf);
+    public static AsymProfile extendAsym(MotionProfile p, double vm, double ai, double af, double xf, double vf) {
+        return extendAsym(p, vm, ai, af, p.tf, xf, vf);
     }
 }

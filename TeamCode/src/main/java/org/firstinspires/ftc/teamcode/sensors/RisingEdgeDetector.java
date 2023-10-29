@@ -9,6 +9,8 @@ public class RisingEdgeDetector implements BooleanSupplier {
     }
     @Override
     public boolean getAsBoolean() {
-        return !last && (last = condition.getAsBoolean());
+        boolean temp = last;
+        last = condition.getAsBoolean();
+        return (last = condition.getAsBoolean()) && !temp;
     }
 }

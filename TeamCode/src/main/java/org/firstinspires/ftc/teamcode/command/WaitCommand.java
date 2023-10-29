@@ -15,13 +15,13 @@ public class WaitCommand extends Command {
         this.seconds = seconds;
     }
     @Override
-    public void init() {}
+    public void init(double time) {}
     @Override
-    public void run() {}
+    public void run(double time) {}
     @Override
-    public void end(boolean canceled) {}
+    public void end(double time, boolean canceled) {}
     @Override
-    public boolean done() {
-        return clock.seconds() > start + seconds;
+    public boolean done(double time) {
+        return time > start + seconds;
     }
 }

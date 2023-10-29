@@ -20,45 +20,45 @@ public class DeadlineCommand extends Command {
         dones = new boolean[commands.length];
     }
     @Override
-    public void init() {
-        primary.init();
+    public void init(double time) {
+        primary.init(time);
         for (Command command : commands) {
-            command.init();
+            command.init(time);
         }
     }
     @Override
-    public void run() {
-        primary.run();
+    public void run(double time) {
+        primary.run(time);
         for (int i = 0; i < commands.length; i++) {
             if (!dones[i]) {
-                if (commands[i].done()) {
+                if (commands[i].done(time)) {
                     dones[i] = true;
-                    commands[i].end(false);
+                    commands[i].end(time, false);
                 } else {
-                    commands[i].run();
+                    commands[i].run(time);
                 }
             }
         }
     }
     @Override
-    public void end(boolean canceled) {
+    public void end(double time, boolean canceled) {
         if (canceled) {
-            primary.end(true);
+            primary.end(time, true);
             for (int i = 0; i < commands.length; i++) {
                 if (!dones[i]) {
-                    commands[i].end(true);
+                    commands[i].end(time, true);
                 }
             }
         }
-        primary.end(false);
+        primary.end(time, false);
         for (Command command : commands) {
-            if (command.done()) {
-                command.end(false);
+            if (command.done(time)) {
+                command.end(time, false);
             }
         }
     }
     @Override
-    public boolean done() {
-        return primary.done();
+    public boolean done(double time) {
+        return primary.done(time);
     }
 }

@@ -15,8 +15,8 @@ public abstract class AbstractMecanumDrivetrain extends Drivetrain {
         this.fl = opMode.hardwareMap.get(DcMotorEx.class, flName);
         this.br = opMode.hardwareMap.get(DcMotorEx.class, brName);
         this.bl = opMode.hardwareMap.get(DcMotorEx.class, blName);
-        fl.setDirection(DcMotorSimple.Direction.REVERSE);
-        bl.setDirection(DcMotorSimple.Direction.REVERSE);
+        fr.setDirection(DcMotorSimple.Direction.REVERSE);
+        br.setDirection(DcMotorSimple.Direction.REVERSE);
         fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         fl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         br.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

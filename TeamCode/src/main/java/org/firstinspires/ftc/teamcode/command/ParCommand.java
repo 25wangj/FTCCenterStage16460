@@ -19,44 +19,44 @@ public class ParCommand extends Command {
         numDone = 0;
     }
     @Override
-    public void init() {
+    public void init(double time) {
         for (Command command : commands) {
-            command.init();
+            command.init(time);
         }
     }
     @Override
-    public void run() {
+    public void run(double time) {
         for (int i = 0; i < commands.length; i++) {
             if (!dones[i]) {
                 if (justDones[i]) {
-                    commands[i].end(false);
+                    commands[i].end(time, false);
                     justDones[i] = false;
                 } else {
-                    commands[i].run();
+                    commands[i].run(time);
                 }
             }
         }
     }
     @Override
-    public void end(boolean canceled) {
+    public void end(double time, boolean canceled) {
         if (canceled) {
             for (int i = 0; i < commands.length; i++) {
                 if (!dones[i]) {
-                    commands[i].end(true);
+                    commands[i].end(time, true);
                 }
             }
         } else {
             for (int i = 0; i < commands.length; i++) {
                 if (justDones[i]) {
-                    commands[i].end(false);
+                    commands[i].end(time, false);
                 }
             }
         }
     }
     @Override
-    public boolean done() {
+    public boolean done(double time) {
         for (int i = 0; i < commands.length; i++) {
-            if (!dones[i] && commands[i].done()) {
+            if (!dones[i] && commands[i].done(time)) {
                 justDones[i] = true;
                 dones[i] = true;
                 numDone++;

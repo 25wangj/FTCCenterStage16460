@@ -13,27 +13,27 @@ public class RaceCommand extends Command {
         this.commands = commands;
     }
     @Override
-    public void init() {
+    public void init(double time) {
         for (Command command : commands) {
-            command.init();
+            command.init(time);
         }
     }
     @Override
-    public void run() {
+    public void run(double time) {
         for (Command command : commands) {
-            command.run();
+            command.run(time);
         }
     }
     @Override
-    public void end(boolean canceled) {
+    public void end(double time, boolean canceled) {
         for (Command command : commands) {
-            command.end(canceled);
+            command.end(time, canceled);
         }
     }
     @Override
-    public boolean done() {
+    public boolean done(double time) {
         for (Command command : commands) {
-            if (command.done()) {
+            if (command.done(time)) {
                 return true;
             }
         }

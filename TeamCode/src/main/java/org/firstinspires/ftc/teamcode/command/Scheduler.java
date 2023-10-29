@@ -8,7 +8,8 @@ import java.util.Set;
 public class Scheduler {
     private HashSet<Command> commands;
     private HashMap<Subsystem, Command> subsystems;
-    private HashSet<Command> added;
+    private ArrayList<Command> added;
+    private ArrayList<Command> removed;
     private HashSet<Listener> listeners;
     private ElapsedTime clock;
     public Scheduler() {
@@ -17,7 +18,8 @@ public class Scheduler {
     public Scheduler(ElapsedTime clock) {
         commands = new HashSet<>();
         subsystems = new HashMap<>();
-        added = new HashSet<>();
+        added = new ArrayList<>();
+        removed = new ArrayList<>();
         listeners = new HashSet<>();
         this.clock = clock;
     }
@@ -33,29 +35,37 @@ public class Scheduler {
                 }
             }
             for (Command command : added) {
-                command.init();
+                command.init(time);
                 commands.add(command);
                 for (Subsystem subsystem : command.getSubsystems()) {
                     subsystems.put(subsystem, command);
                 }
             }
+            added.clear();
+            for (Command command : removed) {
+                command.end(time, true);
+            }
+            removed.clear();
             for (Command command : commands) {
-                if (command.done()) {
-                    command.end(false);
-                    for (Subsystem subsystem : command.getSubsystems()) {
-                        subsystems.put(subsystem, null);
-                    }
-                    commands.remove(command);
+                if (command.done(time)) {
+                    removed.add(command);
                 } else {
-                    command.run();
+                    command.run(time);
                 }
             }
-            added.clear();
+            for (Command command : removed) {
+                command.end(time, false);
+                for (Subsystem subsystem : command.getSubsystems()) {
+                    subsystems.put(subsystem, null);
+                }
+                commands.remove(command);
+            }
+            removed.clear();
         }
     }
     public boolean schedule(Command command) {
         ArrayList<Command> toCancel = new ArrayList<>();
-        if (commands.contains(command) || added.contains(command)) {
+        if (commands.contains(command)) {
             return false;
         }
         for (Subsystem subsystem : command.getSubsystems()) {
@@ -77,7 +87,7 @@ public class Scheduler {
                     subsystems.put(subsystem, null);
                 }
                 commands.remove(command);
-                command.end(true);
+                removed.add(command);
             }
         }
     }
@@ -85,9 +95,7 @@ public class Scheduler {
         for (Subsystem subsystem : subsystems.keySet()) {
             subsystems.put(subsystem, null);
         }
-        for (Command command : commands) {
-            command.end(true);
-        }
+        removed.addAll(commands);
         commands.clear();
         added.clear();
     }

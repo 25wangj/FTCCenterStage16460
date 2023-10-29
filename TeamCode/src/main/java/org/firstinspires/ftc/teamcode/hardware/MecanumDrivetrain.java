@@ -20,6 +20,7 @@ public class MecanumDrivetrain extends AbstractMecanumDrivetrain {
         heading = 0;
         offset = 0;
         if (!auto) {
+            gyro = opMode.hardwareMap.get(IMU.class, "gyro");
             synchronized (gyroLock) {
                 IMU.Parameters parameters = new IMU.Parameters(orientation);
                 gyro.initialize(parameters);
