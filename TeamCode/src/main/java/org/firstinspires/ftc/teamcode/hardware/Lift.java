@@ -28,10 +28,10 @@ public class Lift implements Subsystem {
     public static final double armKd = 0;
     public static final double armKi = 0.01;
     public static final ToDoubleFunction<double[]> armKf = x -> 0.000005 * x[2];
-    public static final double liftVm = 3000;
+    public static final double liftVm = 3500;
     public static final double liftAi = 30000;
     public static final double liftAf = 20000;
-    public static final double armVm = 2500;
+    public static final double armVm = 3000;
     public static final double armAi = 30000;
     public static final double armAf = 20000;
     private DcMotorEx liftR;
