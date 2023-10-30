@@ -1,4 +1,5 @@
 package org.firstinspires.ftc.teamcode.command;
+import java.util.HashSet;
 public class ParCommand extends Command {
     public Command[] commands;
     public boolean[] dones;

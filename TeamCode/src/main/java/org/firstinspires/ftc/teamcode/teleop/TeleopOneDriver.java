@@ -4,8 +4,8 @@ import static org.firstinspires.ftc.teamcode.hardware.ValueStorage.*;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.command.CommandOpMode;
 import org.firstinspires.ftc.teamcode.command.FnCommand;
-import org.firstinspires.ftc.teamcode.command.Listener;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
+import org.firstinspires.ftc.teamcode.sensors.RisingEdgeDetector;
 @TeleOp(name = "OneDriver")
 public class TeleopOneDriver extends CommandOpMode {
     Robot robot;
@@ -13,7 +13,7 @@ public class TeleopOneDriver extends CommandOpMode {
     public void initOpMode() {
         robot = new Robot(this, false);
         robot.drive.setHeading(lastPose.getH() + lastSide * PI / 2);
-        scheduler.addListener(Listener.risingEdge(() -> gamepad1.ps, FnCommand.once(t -> robot.drive.setHeading(0))));
+        scheduler.addListener(RisingEdgeDetector.listen(() -> gamepad1.ps, FnCommand.once(t -> robot.drive.setHeading(0))));
         scheduler.schedule(FnCommand.repeat(t -> {
             double heading = robot.drive.getHeading();
             double x = gamepad1.left_stick_x * cos(heading) - gamepad1.left_stick_y * sin(heading);

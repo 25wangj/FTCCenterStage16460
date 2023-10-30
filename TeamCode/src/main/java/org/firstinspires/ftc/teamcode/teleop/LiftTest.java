@@ -7,17 +7,17 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import org.firstinspires.ftc.teamcode.command.CommandOpMode;
 import org.firstinspires.ftc.teamcode.command.FnCommand;
-import org.firstinspires.ftc.teamcode.command.Listener;
 import org.firstinspires.ftc.teamcode.command.Subsystem;
 import org.firstinspires.ftc.teamcode.control.AsymProfile;
 import org.firstinspires.ftc.teamcode.control.DelayProfile;
 import org.firstinspires.ftc.teamcode.control.MotionProfile;
 import org.firstinspires.ftc.teamcode.control.PidfController;
+import org.firstinspires.ftc.teamcode.sensors.RisingEdgeDetector;
 @Config
 @TeleOp(name = "LiftTest")
 public class LiftTest extends CommandOpMode {
     public static final double liftLow = 140;
-    public static final double liftHigh = 1740;
+    public static final double liftHigh = 1720;
     public static final double armLeft = -360;
     public static final double armRight = 360;
     public static double liftKp = 0.02;
@@ -74,19 +74,19 @@ public class LiftTest extends CommandOpMode {
         };
         scheduler.register(lift);
         scheduler.addListener(
-                Listener.risingEdge(() -> gamepad1.a, new FnCommand(t ->
+                RisingEdgeDetector.listen(() -> gamepad1.a, new FnCommand(t ->
                         liftProfile = AsymProfile.extendAsym(liftProfile, liftVm, liftAi, liftAf, t,
                         min(liftProfile.getX(t) + (liftHigh - liftLow) / (big ? 1 : 8), liftHigh), 0),
                         t -> {}, (t, b) -> {}, t -> t > max(liftProfile.getTf(), armProfile.getTf()), lift)),
-                Listener.risingEdge(() -> gamepad1.b, new FnCommand(t ->
+                RisingEdgeDetector.listen(() -> gamepad1.b, new FnCommand(t ->
                         liftProfile = AsymProfile.extendAsym(liftProfile, liftVm, liftAi, liftAf, t,
                         max(liftProfile.getX(t) - (liftHigh - liftLow) / (big ? 1 : 8), liftLow), 0),
                         t -> {}, (t, b) -> {}, t -> t > max(liftProfile.getTf(), armProfile.getTf()), lift)),
-                Listener.risingEdge(() -> gamepad1.x, new FnCommand(t ->
+                RisingEdgeDetector.listen(() -> gamepad1.x, new FnCommand(t ->
                         armProfile = AsymProfile.extendAsym(armProfile, armVm, armAi, armAf, t,
                         min(armProfile.getX(t) + (armRight - armLeft) / (big ? 1 : 8), armRight), 0),
                         t -> {}, (t, b) -> {}, t -> t > max(liftProfile.getTf(), armProfile.getTf()), lift)),
-                Listener.risingEdge(() -> gamepad1.y, new FnCommand(t ->
+                RisingEdgeDetector.listen(() -> gamepad1.y, new FnCommand(t ->
                         armProfile = AsymProfile.extendAsym(armProfile, armVm, armAi, armAf, t,
                         max(armProfile.getX(t) - (armRight - armLeft) / (big ? 1 : 8), armLeft), 0),
                         t -> {}, (t, b) -> {}, t -> t > max(liftProfile.getTf(), armProfile.getTf()), lift)));

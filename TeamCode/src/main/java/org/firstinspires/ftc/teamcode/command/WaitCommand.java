@@ -1,27 +1,32 @@
 package org.firstinspires.ftc.teamcode.command;
-import com.qualcomm.robotcore.util.ElapsedTime;
+import java.util.Arrays;
+import java.util.function.DoubleConsumer;
 public class WaitCommand extends Command {
-    public ElapsedTime clock;
-    public double start;
-    public double seconds;
+    private DoubleConsumer initFn;
+    private double end;
     public WaitCommand(double seconds) {
-        clock = new ElapsedTime();
-        start = 0;
-        this.seconds = seconds;
+        this(t -> {}, seconds);
     }
-    public WaitCommand(ElapsedTime clock, double start, double seconds) {
-        this.clock = clock;
-        this.start = start;
-        this.seconds = seconds;
+    public WaitCommand(DoubleConsumer initFn, double seconds, Subsystem... systems) {
+        this(initFn, seconds, false, systems);
+    }
+    public WaitCommand(DoubleConsumer initFn, double seconds, boolean cancelable, Subsystem... systems) {
+        subsystems.addAll(Arrays.asList(systems));
+        this.initFn = initFn;
+        this.cancelable = cancelable;
+        end = seconds;
     }
     @Override
-    public void init(double time) {}
+    public void init(double time) {
+        end += time;
+        initFn.accept(time);
+    }
     @Override
     public void run(double time) {}
     @Override
     public void end(double time, boolean canceled) {}
     @Override
     public boolean done(double time) {
-        return time > start + seconds;
+        return time > end;
     }
 }
