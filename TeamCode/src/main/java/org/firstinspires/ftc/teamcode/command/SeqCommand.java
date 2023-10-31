@@ -6,12 +6,13 @@ public class SeqCommand extends Command {
     public SeqCommand(Command... commands) {
         for (Command command : commands) {
             subsystems.addAll(command.getSubsystems());
+            cancelable = cancelable && command.cancelable;
         }
         this.commands = commands;
-        index = 0;
     }
     @Override
     public void init(double time) {
+        index = 0;
         commands[0].init(time);
     }
     @Override

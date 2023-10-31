@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.command;
 import java.util.HashSet;
 public abstract class Command {
     protected HashSet<Subsystem> subsystems = new HashSet<>();
-    protected boolean cancelable;
+    protected boolean cancelable = true;
     public abstract void init(double time);
     public abstract void run(double time);
     public abstract void end(double time, boolean canceled);

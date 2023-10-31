@@ -21,6 +21,9 @@ public class StateMachine<T extends Enum<T>> {
         return state;
     }
     public boolean transition(T next, double... params) {
+        if (state == next) {
+            return true;
+        }
         if (!transitions.containsKey(new Pair<>(state, next))) {
             throw new IllegalArgumentException("Transition does not exist");
         }

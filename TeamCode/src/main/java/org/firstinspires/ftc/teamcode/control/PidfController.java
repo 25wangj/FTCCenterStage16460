@@ -11,6 +11,7 @@ public class PidfController {
     double f = 0;
     double lastTime = 0;
     double lastE = 0;
+    boolean first;
     public PidfController(double kp, double ki, double kd) {
         this(kp, ki, kd, x -> 0d);
     }
@@ -19,6 +20,7 @@ public class PidfController {
         this.ki = ki;
         this.kd = kd;
         this.kf = kf;
+        first = true;
     }
     public void reset() {
         i = 0;
@@ -42,7 +44,11 @@ public class PidfController {
     public void update(double time, double... x) {
         double dt = time - lastTime;
         e = setPoint - x[0];
-        i += (e + lastE) * dt / 2;
+        if (first) {
+            first = false;
+        } else {
+            i += (e + lastE) * dt / 2;
+        }
         d = (e - lastE) / dt;
         f = kf.applyAsDouble(x);
         if (lastE > 0 != e > 0) {

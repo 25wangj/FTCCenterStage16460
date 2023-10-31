@@ -4,6 +4,7 @@ import java.util.function.DoubleConsumer;
 public class WaitCommand extends Command {
     private DoubleConsumer initFn;
     private double end;
+    private double seconds;
     public WaitCommand(double seconds) {
         this(t -> {}, seconds);
     }
@@ -14,11 +15,11 @@ public class WaitCommand extends Command {
         subsystems.addAll(Arrays.asList(systems));
         this.initFn = initFn;
         this.cancelable = cancelable;
-        end = seconds;
+        this.seconds = seconds;
     }
     @Override
     public void init(double time) {
-        end += time;
+        end = time + seconds;
         initFn.accept(time);
     }
     @Override

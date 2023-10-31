@@ -1,11 +1,11 @@
 package org.firstinspires.ftc.teamcode.command;
-import java.util.HashSet;
 public class ParCommand extends Command {
     public Command[] commands;
     public boolean[] dones;
     public boolean[] justDones;
     public int numDone;
     public ParCommand(Command... commands) {
+        System.out.println("Parallel command constructed");
         for (Command command : commands) {
             for (Subsystem subsystem : command.getSubsystems()) {
                 if (subsystems.contains(subsystem)) {
@@ -13,14 +13,16 @@ public class ParCommand extends Command {
                 }
                 subsystems.add(subsystem);
             }
+            cancelable = cancelable && command.cancelable;
         }
         this.commands = commands;
-        dones = new boolean[commands.length];
-        justDones = new boolean[commands.length];
-        numDone = 0;
     }
     @Override
     public void init(double time) {
+        System.out.println("Parallel command initialized");
+        dones = new boolean[commands.length];
+        justDones = new boolean[commands.length];
+        numDone = 0;
         for (Command command : commands) {
             command.init(time);
         }

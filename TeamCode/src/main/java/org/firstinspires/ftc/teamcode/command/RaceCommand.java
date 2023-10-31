@@ -9,6 +9,7 @@ public class RaceCommand extends Command {
                 }
                 subsystems.add(subsystem);
             }
+            cancelable = cancelable && command.cancelable;
         }
         this.commands = commands;
     }

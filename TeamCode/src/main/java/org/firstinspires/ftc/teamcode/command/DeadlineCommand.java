@@ -17,10 +17,10 @@ public class DeadlineCommand extends Command {
         }
         this.primary = primary;
         this.commands = commands;
-        dones = new boolean[commands.length];
     }
     @Override
     public void init(double time) {
+        dones = new boolean[commands.length];
         primary.init(time);
         for (Command command : commands) {
             command.init(time);

@@ -1,15 +1,18 @@
 package org.firstinspires.ftc.teamcode.command;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Queue;
 import java.util.Set;
 public class Scheduler {
     private HashSet<Command> commands;
     private HashMap<Subsystem, Command> subsystems;
-    private ArrayList<Command> added;
-    private ArrayList<Command> removed;
+    private Queue<Command> added;
+    private Queue<Command> canceled;
+    private ArrayList<Command> finished;
     private HashSet<Listener> listeners;
     private ElapsedTime clock;
     public Scheduler() {
@@ -18,8 +21,9 @@ public class Scheduler {
     public Scheduler(ElapsedTime clock) {
         commands = new HashSet<>();
         subsystems = new HashMap<>();
-        added = new ArrayList<>();
-        removed = new ArrayList<>();
+        added = new ArrayDeque<>();
+        canceled = new ArrayDeque<>();
+        finished = new ArrayList<>();
         listeners = new HashSet<>();
         this.clock = clock;
     }
@@ -34,60 +38,61 @@ public class Scheduler {
                     schedule(listener.getCommand());
                 }
             }
-            for (Command command : added) {
+            for (int i = canceled.size(); i > 0; i--) {
+                Command command = canceled.poll();
+                for (Subsystem subsystem : command.getSubsystems()) {
+                    subsystems.put(subsystem, null);
+                }
+                commands.remove(command);
+                command.end(time, true);
+            }
+            for (int i = added.size(); i > 0; i--) {
+                Command command = added.poll();
                 command.init(time);
                 commands.add(command);
                 for (Subsystem subsystem : command.getSubsystems()) {
                     subsystems.put(subsystem, command);
                 }
             }
-            added.clear();
-            for (Command command : removed) {
-                command.end(time, true);
-            }
-            removed.clear();
             for (Command command : commands) {
                 if (command.done(time)) {
-                    removed.add(command);
+                    finished.add(command);
                 } else {
                     command.run(time);
                 }
             }
-            for (Command command : removed) {
+            for (Command command : finished) {
                 command.end(time, false);
                 for (Subsystem subsystem : command.getSubsystems()) {
                     subsystems.put(subsystem, null);
                 }
                 commands.remove(command);
             }
-            removed.clear();
         }
     }
     public boolean schedule(Command command) {
-        ArrayList<Command> toCancel = new ArrayList<>();
+        HashSet<Command> toCancel = new HashSet<>();
         if (commands.contains(command)) {
             return false;
         }
         for (Subsystem subsystem : command.getSubsystems()) {
             if (!subsystems.containsKey(subsystem)) {
-                throw new IllegalArgumentException("Command uses unregistered subsystem");
-            } else if (subsystems.get(subsystem) != null && !subsystems.get(subsystem).isCancelable()) {
-                return false;
+            } else if (subsystems.get(subsystem) != null) {
+                if (subsystems.get(subsystem).isCancelable()) {
+                    toCancel.add(subsystems.get(subsystem));
+                } else {
+                    return false;
+                }
             }
-            toCancel.add(subsystems.get(subsystem));
         }
-        added.add(command);
+        added.offer(command);
         cancel(toCancel.toArray(new Command[0]));
         return true;
     }
     public void cancel(Command... toCancel) {
         for (Command command : toCancel) {
             if (commands.contains(command)) {
-                for (Subsystem subsystem : command.getSubsystems()) {
-                    subsystems.put(subsystem, null);
-                }
-                commands.remove(command);
-                removed.add(command);
+                canceled.offer(command);
             }
         }
     }
@@ -95,7 +100,7 @@ public class Scheduler {
         for (Subsystem subsystem : subsystems.keySet()) {
             subsystems.put(subsystem, null);
         }
-        removed.addAll(commands);
+        canceled.addAll(commands);
         commands.clear();
         added.clear();
     }

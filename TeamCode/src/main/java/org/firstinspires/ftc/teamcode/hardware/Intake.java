@@ -14,7 +14,6 @@ public class Intake implements Subsystem {
     public static final double intakeEject = -1;
     public static final double intakeClosed = 0.7;
     public static final double intakeOpen = 1;
-    public static final double intakeSlow = 0.2;
     private DcMotorEx intake;
     private Servo roller;
     private Servo gate;

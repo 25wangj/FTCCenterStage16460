@@ -15,18 +15,18 @@ import org.firstinspires.ftc.teamcode.control.PidfController;
 import java.util.function.ToDoubleFunction;
 public class Lift implements Subsystem {
     public static final double liftLow = 140;
-    public static final double liftHigh = 1740;
+    public static final double liftHigh = 1720;
     public static final double armLeft = -360;
     public static final double armRight = 360;
     public static final double clawClosed = 0.4;
     public static final double clawOpen = 0;
     public static final double liftKp = 0.02;
-    public static final double liftKd = 0;
     public static final double liftKi = 0.01;
+    public static final double liftKd = 0;
     public static final ToDoubleFunction<double[]> liftKf = x -> 0.15 + 0.0001 * x[0] + 0.00001 * x[2];
-    public static final double armKp = 0.02;
-    public static final double armKd = 0;
+    public static final double armKp = 0.015;
     public static final double armKi = 0.01;
+    public static final double armKd = 0;
     public static final ToDoubleFunction<double[]> armKf = x -> 0.000005 * x[2];
     public static final double liftVm = 3500;
     public static final double liftAi = 30000;
@@ -52,8 +52,8 @@ public class Lift implements Subsystem {
             liftR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             liftL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
-        liftPidf = new PidfController(liftKp, liftKd, liftKi, liftKf);
-        armPidf = new PidfController(armKp, armKd, armKi, armKf);
+        liftPidf = new PidfController(liftKp, liftKi, liftKd, liftKf);
+        armPidf = new PidfController(armKp, armKi, armKd, armKf);
         liftProfile = new DelayProfile(0, 0, 0, 0);
         armProfile = new DelayProfile(0, 0, 0, 0);
     }

@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public abstract class CommandOpMode extends LinearOpMode {
     protected Scheduler scheduler;
     ElapsedTime clock = new ElapsedTime();
+    double last = 0;
     public abstract void initOpMode();
     public void waitOpMode() {}
     public void startOpMode() {}
@@ -26,6 +27,8 @@ public abstract class CommandOpMode extends LinearOpMode {
         startOpMode();
         while (opModeIsActive()) {
             scheduler.run(true);
+            telemetry.addData("Loop speed", 1 / (-last + (last = clock.seconds())));
+            telemetry.addData("Commands", scheduler.getCommands());
             telemetry.update();
         }
     }
