@@ -9,8 +9,8 @@ public abstract class AbstractMecanumDrivetrain extends Drivetrain {
     private DcMotorEx fl;
     private DcMotorEx br;
     private DcMotorEx bl;
-    public AbstractMecanumDrivetrain(String frName, String flName, String brName, String blName, LinearOpMode opMode, Localizer localizer, boolean auto) {
-        super(localizer, auto);
+    public AbstractMecanumDrivetrain(String frName, String flName, String brName, String blName, LinearOpMode opMode, boolean auto) {
+        super(auto);
         this.fr = opMode.hardwareMap.get(DcMotorEx.class, frName);
         this.fl = opMode.hardwareMap.get(DcMotorEx.class, flName);
         this.br = opMode.hardwareMap.get(DcMotorEx.class, brName);

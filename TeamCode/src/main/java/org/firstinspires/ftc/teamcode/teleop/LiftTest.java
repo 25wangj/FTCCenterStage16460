@@ -26,10 +26,10 @@ public class LiftTest extends CommandOpMode {
     public static double liftKgd = 0.0001;
     public static double armKp = 0.015;
     public static double armKi = 0.01;
-    public static double liftVm = 3000;
+    public static double liftVm = 3500;
     public static double liftAi = 30000;
     public static double liftAf = 20000;
-    public static double armVm = 2500;
+    public static double armVm = 3000;
     public static double armAi = 30000;
     public static double armAf = 20000;
     public static double liftKa = 0.00001;

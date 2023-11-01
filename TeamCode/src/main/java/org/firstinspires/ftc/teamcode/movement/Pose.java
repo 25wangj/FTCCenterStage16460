@@ -11,13 +11,13 @@ public class Pose {
     public Pose(Vec v, double h) {
         this(v.getX(), v.getY(), h);
     }
-    public double getX() {
+    public double x() {
         return x;
     }
-    public double getY() {
+    public double y() {
         return y;
     }
-    public double getH() {
+    public double h() {
         return h;
     }
     public Vec vec() {

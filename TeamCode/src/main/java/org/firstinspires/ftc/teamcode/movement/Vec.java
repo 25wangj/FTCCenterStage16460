@@ -12,4 +12,13 @@ public class Vec {
     public double getY() {
         return y;
     }
+    public double norm() {
+        return Math.sqrt(x * x + y * y);
+    }
+    public Vec mult(double a) {
+        return new Vec(a * x, a * y);
+    }
+    public Vec combo(double a, Vec other, double b) {
+        return new Vec(a * x + b * other.x, a * y + b * other.y);
+    }
 }

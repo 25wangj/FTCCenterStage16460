@@ -18,10 +18,9 @@ public class TeleopOneDriver extends CommandOpMode {
     @Override
     public void initOpMode() {
         robot = new Robot(this, false);
-        robot.drive.setHeading(lastPose.getH() + lastSide * PI / 2);
+        robot.drive.setHeading(lastPose.h() + lastSide * PI / 2);
         scheduler.addListener(RisingEdgeDetector.listen(() -> gamepad1.ps, FnCommand.once(t -> robot.drive.setHeading(0))));
         scheduler.schedule(FnCommand.repeat(t -> {
-            telemetry.addData("State", robot.stateMachine.state());
             if (gamepad1.right_trigger > 0.2) {
                 if (robot.stateMachine.state() == INTAKE_OPEN) {
                     robot.stateMachine.transition(EJECT_OPEN);
@@ -39,6 +38,11 @@ public class TeleopOneDriver extends CommandOpMode {
                 }
             } else if (robot.stateMachine.state() == INTAKE_CLOSED || robot.stateMachine.state() == INTAKE_OPEN) {
                 robot.intake.setRoller(rollerDown);
+            }
+            if (gamepad1.dpad_up || gamepad1.dpad_down || gamepad1.dpad_left || gamepad1.dpad_right) {
+                if (robot.stateMachine.state() == DEPOSIT || robot.stateMachine.state() == RETRACT) {
+
+                }
             }
             double heading = robot.drive.getHeading();
             double x = gamepad1.left_stick_x * cos(heading) - gamepad1.left_stick_y * sin(heading);
@@ -68,9 +72,14 @@ public class TeleopOneDriver extends CommandOpMode {
                         robot.stateMachine.transition(DEPOSIT);
                     }})),
                 RisingEdgeDetector.listen(() -> (gamepad1.a || gamepad1.b || gamepad1.x || gamepad1.y), FnCommand.once(t -> {
-                    if (robot.stateMachine.state() == DEPOSIT || robot.stateMachine.state() == RETRACT) {
-                        double liftPos = liftPos(gamepad1.b, gamepad1.x, gamepad1.y);
-                        double armPos = armPos(gamepad1.left_trigger > 0.2, gamepad1.right_trigger > 0.2);
+                    double liftPos = liftPos(gamepad1.b, gamepad1.x, gamepad1.y);
+                    double armPos = armPos(gamepad1.left_trigger > 0.2, gamepad1.right_trigger > 0.2);
+                    if (robot.stateMachine.state() == INTAKE_OPEN) {
+                        if (robot.stateMachine.transition(DEPOSIT, liftPos, armPos)) {
+                            lastLiftPos = liftPos;
+                            lastArmPos = armPos;
+                        }
+                    } else if (robot.stateMachine.state() == DEPOSIT || robot.stateMachine.state() == RETRACT) {
                         if (scheduler.schedule(robot.lift.goTo(liftPos, armPos))) {
                             lastLiftPos = liftPos;
                             lastArmPos = armPos;}}})));

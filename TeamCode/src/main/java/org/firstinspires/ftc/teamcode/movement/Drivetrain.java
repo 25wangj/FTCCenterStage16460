@@ -1,13 +1,10 @@
 package org.firstinspires.ftc.teamcode.movement;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import org.firstinspires.ftc.teamcode.command.Subsystem;
 public abstract class Drivetrain implements Subsystem {
-    protected boolean auto;
+    private boolean auto;
     protected Localizer localizer;
-    public Drivetrain(Localizer localizer, boolean auto) {
+    public Drivetrain(boolean auto) {
         this.auto = auto;
-        this.localizer = localizer;
     }
     public void setPose(Pose p) {
         localizer.setPose(p);
@@ -20,7 +17,7 @@ public abstract class Drivetrain implements Subsystem {
     }
     @Override
     public void update(double time, boolean active) {
-        if (active && auto) {
+        if (active && auto && localizer != null) {
             localizer.update(time);
         }
     }

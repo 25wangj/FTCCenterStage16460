@@ -28,7 +28,6 @@ public abstract class CommandOpMode extends LinearOpMode {
         while (opModeIsActive()) {
             scheduler.run(true);
             telemetry.addData("Loop speed", 1 / (-last + (last = clock.seconds())));
-            telemetry.addData("Commands", scheduler.getCommands());
             telemetry.update();
         }
     }

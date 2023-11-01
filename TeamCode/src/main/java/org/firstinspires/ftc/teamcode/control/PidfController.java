@@ -9,9 +9,8 @@ public class PidfController {
     double i = 0;
     double d = 0;
     double f = 0;
-    double lastTime = 0;
+    double lastTime = Double.NaN;
     double lastE = 0;
-    boolean first;
     public PidfController(double kp, double ki, double kd) {
         this(kp, ki, kd, x -> 0d);
     }
@@ -20,7 +19,6 @@ public class PidfController {
         this.ki = ki;
         this.kd = kd;
         this.kf = kf;
-        first = true;
     }
     public void reset() {
         i = 0;
@@ -42,18 +40,16 @@ public class PidfController {
         return kp * e + ki * i + kd * d + f;
     }
     public void update(double time, double... x) {
-        double dt = time - lastTime;
         e = setPoint - x[0];
-        if (first) {
-            first = false;
-        } else {
+        if (!Double.isNaN(lastTime)) {
+            double dt = time - lastTime;
             i += (e + lastE) * dt / 2;
+            d = (e - lastE) / dt;
+            if (lastE > 0 != e > 0) {
+                reset();
+            }
         }
-        d = (e - lastE) / dt;
         f = kf.applyAsDouble(x);
-        if (lastE > 0 != e > 0) {
-            reset();
-        }
         lastTime = time;
         lastE = e;
     }
