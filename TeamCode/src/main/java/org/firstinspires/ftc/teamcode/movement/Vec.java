@@ -15,6 +15,9 @@ public class Vec {
     public double norm() {
         return Math.sqrt(x * x + y * y);
     }
+    public Vec normalize() {
+        return mult(1 / norm());
+    }
     public Vec mult(double a) {
         return new Vec(a * x, a * y);
     }

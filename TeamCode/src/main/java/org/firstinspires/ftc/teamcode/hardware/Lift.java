@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.hardware;
 import static java.lang.Math.*;
+import static com.qualcomm.robotcore.util.Range.*;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -18,12 +19,12 @@ public class Lift implements Subsystem {
     public static final double liftHigh = 1720;
     public static final double armLeft = -360;
     public static final double armRight = 360;
-    public static final double clawClosed = 0.4;
-    public static final double clawOpen = 0;
+    public static final double clawClosed = 0.7;
+    public static final double clawOpen = 0.47;
     public static final double liftKp = 0.02;
     public static final double liftKi = 0.01;
     public static final double liftKd = 0;
-    public static final ToDoubleFunction<double[]> liftKf = x -> 0.15 + 0.0001 * x[0] + 0.00001 * x[2];
+    public static final ToDoubleFunction<double[]> liftKf = x -> (x[0] > 80 ? 0.15 + 0.0001 * x[0] : -0.1) + 0.00001 * x[2];
     public static final double armKp = 0.015;
     public static final double armKi = 0.01;
     public static final double armKd = 0;
@@ -34,6 +35,7 @@ public class Lift implements Subsystem {
     public static final double armVm = 3000;
     public static final double armAi = 30000;
     public static final double armAf = 20000;
+    public static final double vAdjust = 200;
     private DcMotorEx liftR;
     private DcMotorEx liftL;
     private Servo claw;
@@ -59,6 +61,16 @@ public class Lift implements Subsystem {
     }
     public double restTime() {
         return max(liftProfile.getTf(), armProfile.getTf());
+    }
+    public Command adjust(double liftAdjust, double armAdjust) {
+        return FnCommand.once(t -> {
+            if (liftAdjust != 0) {
+                liftProfile = AsymProfile.extendAsym(liftProfile, vAdjust, liftAi, liftAf, t,
+                        clip(liftProfile.getX(t) + liftAdjust, liftLow, liftHigh), 0);
+            }
+            if (armAdjust != 0) {
+                armProfile = AsymProfile.extendAsym(armProfile, vAdjust, armAi, armAf, t,
+                        clip(armProfile.getX(t) + armAdjust, armLeft, armRight), 0);}}, this);
     }
     public Command goTo(double liftPos, double armPos) {
         return new FnCommand(t -> {

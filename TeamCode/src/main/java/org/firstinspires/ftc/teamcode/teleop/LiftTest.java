@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.teleop;
 import static java.lang.Math.*;
+import static com.qualcomm.robotcore.util.Range.*;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -20,9 +21,10 @@ public class LiftTest extends CommandOpMode {
     public static final double liftHigh = 1720;
     public static final double armLeft = -360;
     public static final double armRight = 360;
+    public static final double vAdjust = 200;
     public static double liftKp = 0.02;
     public static double liftKi = 0.01;
-    public static double liftKgs = 0.2;
+    public static double liftKgs = 0.15;
     public static double liftKgd = 0.0001;
     public static double armKp = 0.015;
     public static double armKi = 0.01;
@@ -50,7 +52,7 @@ public class LiftTest extends CommandOpMode {
         liftL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         liftR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         liftL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        liftPidf = new PidfController(liftKp, liftKi, 0, x -> liftKgs + x[0] * liftKgd + x[2] * liftKa);
+        liftPidf = new PidfController(liftKp, liftKi, 0, x -> (x[0] > 80 ? liftKgs + x[0] * liftKgd : 0) + x[2] * liftKa);
         armPidf = new PidfController(armKp, armKi, 0, x -> x[2] * armKa);
         liftProfile = new AsymProfile(liftVm, liftAi, liftAf, 0, 0, 0, (liftLow + liftHigh) / 2, 0);
         armProfile = new DelayProfile(0, 0, 0, 0);
@@ -62,8 +64,8 @@ public class LiftTest extends CommandOpMode {
             double rightX = liftR.getCurrentPosition();
             liftPidf.update(t, leftX + rightX, liftProfile.getV(t), liftProfile.getA(t));
             armPidf.update(t,leftX - rightX, armProfile.getV(t), armProfile.getA(t));
-            liftL.setPower(liftPidf.get() + armPidf.get());
-            liftR.setPower(liftPidf.get() - armPidf.get());
+            //liftL.setPower(liftPidf.get() + armPidf.get());
+            //liftR.setPower(liftPidf.get() - armPidf.get());
             liftPidf.setConstants(liftKp, liftKi, 0, x -> liftKgs + x[0] * liftKgd + x[2] * liftKa);
             armPidf.setConstants(armKp, armKi, 0, x -> x[2] * armKa);
             big = gamepad1.right_trigger > 0.2;
@@ -73,6 +75,20 @@ public class LiftTest extends CommandOpMode {
             telemetry.addData("Arm Estimated Position", armProfile.getX(t));
         };
         scheduler.register(lift);
+        scheduler.schedule(FnCommand.repeat(d -> {
+                if (gamepad1.dpad_up || gamepad1.dpad_down || gamepad1.dpad_left || gamepad1.dpad_right) {
+                    scheduler.schedule(FnCommand.once(t -> {
+                        double liftAdjust = liftAdjust(gamepad1.dpad_up, gamepad1.dpad_down);
+                        double armAdjust = armAdjust(gamepad1.dpad_left, gamepad1.dpad_right);
+                        if (liftAdjust != 0) {
+                            liftProfile = AsymProfile.extendAsym(liftProfile, vAdjust, liftAi, liftAf, t,
+                                    clip(liftProfile.getX(t) + liftAdjust, liftLow, liftHigh), 0);
+                        }
+                        if (armAdjust != 0) {
+                            armProfile = AsymProfile.extendAsym(armProfile, vAdjust, armAi, armAf, t,
+                                    clip(armProfile.getX(t) + armAdjust, liftLow, liftHigh), 0);
+                        }
+                    }, lift));}}));
         scheduler.addListener(
                 RisingEdgeDetector.listen(() -> gamepad1.a, new FnCommand(t ->
                         liftProfile = AsymProfile.extendAsym(liftProfile, liftVm, liftAi, liftAf, t,
@@ -90,5 +106,21 @@ public class LiftTest extends CommandOpMode {
                         armProfile = AsymProfile.extendAsym(armProfile, armVm, armAi, armAf, t,
                         max(armProfile.getX(t) - (armRight - armLeft) / (big ? 1 : 8), armLeft), 0),
                         t -> {}, (t, b) -> {}, t -> t > max(liftProfile.getTf(), armProfile.getTf()), lift)));
+    }
+    private static double liftAdjust(boolean up, boolean down) {
+        if (up) {
+            return 25;
+        } else if (down) {
+            return -25;
+        }
+        return 0;
+    }
+    private static double armAdjust(boolean right, boolean left) {
+        if (right) {
+            return 10;
+        } else if (left) {
+            return -10;
+        }
+        return 0;
     }
 }

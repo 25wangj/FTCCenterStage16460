@@ -72,7 +72,7 @@ public class Scheduler {
     }
     public boolean schedule(Command command) {
         HashSet<Command> toCancel = new HashSet<>();
-        if (commands.contains(command)) {
+        if (command == null || commands.contains(command)) {
             return false;
         }
         for (Subsystem subsystem : command.getSubsystems()) {

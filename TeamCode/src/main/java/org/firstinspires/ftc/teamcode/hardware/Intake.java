@@ -3,10 +3,15 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+
+import org.firstinspires.ftc.teamcode.command.Command;
+import org.firstinspires.ftc.teamcode.command.SeqCommand;
 import org.firstinspires.ftc.teamcode.command.Subsystem;
+import org.firstinspires.ftc.teamcode.command.WaitCommand;
+
 public class Intake implements Subsystem {
-    public static final double rollerUp = 0;
-    public static final double rollerDown = 0.05;
+    public static final double rollerUp = 0.26;
+    public static final double rollerDown = 0.37;
     public static final double gateClosed = 0.45;
     public static final double gateOpen = 0.73;
     public static final double gatePush = 0.68;
@@ -22,6 +27,11 @@ public class Intake implements Subsystem {
         roller = opMode.hardwareMap.get(Servo.class, "roller");
         gate = opMode.hardwareMap.get(Servo.class, "gate");
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
+    }
+    public Command twiddle() {
+        return new SeqCommand(new WaitCommand(t -> setGate(gatePush), 0.15, this),
+                new WaitCommand(t -> setGate(0.78), 0.15, this),
+                new WaitCommand(t -> setGate(gateOpen), 0.1, this));
     }
     public void setRoller(double pos) {
         roller.setPosition(pos);

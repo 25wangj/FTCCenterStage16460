@@ -11,7 +11,7 @@ public class Line implements Path {
         return start.combo(1, dir, t);
     }
     @Override
-    public Vec vel(double t) {
+    public Vec dir(double t) {
         return dir;
     }
     @Override
@@ -21,5 +21,17 @@ public class Line implements Path {
     @Override
     public double length() {
         return dir.norm();
+    }
+    public static Line extendX(Vec pos, Vec dir, double x) {
+        if (dir.getX() == 0 || dir.getX() * (pos.getX() - x) < 0) {
+            throw new IllegalArgumentException("Extension impossible");
+        }
+        return new Line(pos, new Vec(x, pos.getY() + dir.getY() / dir.getX() * (pos.getX() - x)));
+    }
+    public static Line extendY(Vec pos, Vec dir, double y) {
+        if (dir.getY() == 0 || dir.getY() * (pos.getY() - y) < 0) {
+            throw new IllegalArgumentException("Extension impossible");
+        }
+        return new Line(pos, new Vec(pos.getX() + dir.getX() / dir.getY() * (pos.getY() - y), y));
     }
 }

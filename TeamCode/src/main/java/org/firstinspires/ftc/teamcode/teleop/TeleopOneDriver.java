@@ -8,6 +8,8 @@ import static org.firstinspires.ftc.teamcode.hardware.RobotStateMachine.robotSta
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.command.CommandOpMode;
 import org.firstinspires.ftc.teamcode.command.FnCommand;
+import org.firstinspires.ftc.teamcode.command.SeqCommand;
+import org.firstinspires.ftc.teamcode.command.WaitCommand;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
 import org.firstinspires.ftc.teamcode.sensors.RisingEdgeDetector;
 @TeleOp(name = "OneDriver")
@@ -21,7 +23,7 @@ public class TeleopOneDriver extends CommandOpMode {
         robot.drive.setHeading(lastPose.h() + lastSide * PI / 2);
         scheduler.addListener(RisingEdgeDetector.listen(() -> gamepad1.ps, FnCommand.once(t -> robot.drive.setHeading(0))));
         scheduler.schedule(FnCommand.repeat(t -> {
-            if (gamepad1.right_trigger > 0.2) {
+            if (gamepad1.right_trigger > 0.8) {
                 if (robot.stateMachine.state() == INTAKE_OPEN) {
                     robot.stateMachine.transition(EJECT_OPEN);
                 } else if (robot.stateMachine.state() == INTAKE_CLOSED) {
@@ -40,8 +42,11 @@ public class TeleopOneDriver extends CommandOpMode {
                 robot.intake.setRoller(rollerDown);
             }
             if (gamepad1.dpad_up || gamepad1.dpad_down || gamepad1.dpad_left || gamepad1.dpad_right) {
-                if (robot.stateMachine.state() == DEPOSIT || robot.stateMachine.state() == RETRACT) {
-
+                if (robot.stateMachine.state() == INTAKE_OPEN) {
+                    scheduler.schedule(robot.intake.twiddle());
+                } else if (robot.stateMachine.state() == DEPOSIT || robot.stateMachine.state() == RETRACT) {
+                    scheduler.schedule(robot.lift.adjust(liftAdjust(gamepad1.dpad_up, gamepad1.dpad_down),
+                            armAdjust(gamepad1.dpad_right, gamepad1.dpad_left)));
                 }
             }
             double heading = robot.drive.getHeading();
@@ -84,7 +89,7 @@ public class TeleopOneDriver extends CommandOpMode {
                             lastLiftPos = liftPos;
                             lastArmPos = armPos;}}})));
     }
-    public double liftPos(boolean b, boolean x, boolean y) {
+    private static double liftPos(boolean b, boolean x, boolean y) {
         if (b) {
             return 720;
         } else if (y) {
@@ -94,11 +99,27 @@ public class TeleopOneDriver extends CommandOpMode {
         }
         return 220;
     }
-    public double armPos(boolean left, boolean right) {
+    private static double armPos(boolean left, boolean right) {
         if (left) {
             return armLeft;
         } else if (right) {
             return armRight;
+        }
+        return 0;
+    }
+    private static double liftAdjust(boolean up, boolean down) {
+        if (up) {
+            return 10;
+        } else if (down) {
+            return -10;
+        }
+        return 0;
+    }
+    private static double armAdjust(boolean right, boolean left) {
+        if (right) {
+            return 5;
+        } else if (left) {
+            return -5;
         }
         return 0;
     }
