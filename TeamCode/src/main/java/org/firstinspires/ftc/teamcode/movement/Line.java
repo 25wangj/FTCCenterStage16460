@@ -12,7 +12,11 @@ public class Line implements Path {
     }
     @Override
     public Vec dir(double t) {
-        return dir;
+        return dir.normalize();
+    }
+    @Override
+    public double angVel(double t) {
+        return 0;
     }
     @Override
     public Vec curvature(double t) {
@@ -23,15 +27,15 @@ public class Line implements Path {
         return dir.norm();
     }
     public static Line extendX(Vec pos, Vec dir, double x) {
-        if (dir.getX() == 0 || dir.getX() * (pos.getX() - x) < 0) {
+        if (dir.x() == 0 || dir.x() * (pos.x() - x) < 0) {
             throw new IllegalArgumentException("Extension impossible");
         }
-        return new Line(pos, new Vec(x, pos.getY() + dir.getY() / dir.getX() * (pos.getX() - x)));
+        return new Line(pos, new Vec(x, pos.y() + dir.y() / dir.x() * (pos.x() - x)));
     }
     public static Line extendY(Vec pos, Vec dir, double y) {
-        if (dir.getY() == 0 || dir.getY() * (pos.getY() - y) < 0) {
+        if (dir.y() == 0 || dir.y() * (pos.y() - y) < 0) {
             throw new IllegalArgumentException("Extension impossible");
         }
-        return new Line(pos, new Vec(pos.getX() + dir.getX() / dir.getY() * (pos.getY() - y), y));
+        return new Line(pos, new Vec(pos.x() + dir.x() / dir.y() * (pos.y() - y), y));
     }
 }

@@ -9,7 +9,7 @@ public class Pose {
         this.h = h;
     }
     public Pose(Vec v, double h) {
-        this(v.getX(), v.getY(), h);
+        this(v.x(), v.y(), h);
     }
     public double x() {
         return x;

@@ -11,6 +11,7 @@ import org.firstinspires.ftc.teamcode.command.FnCommand;
 import org.firstinspires.ftc.teamcode.command.SeqCommand;
 import org.firstinspires.ftc.teamcode.command.WaitCommand;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
+import org.firstinspires.ftc.teamcode.movement.Vec;
 import org.firstinspires.ftc.teamcode.sensors.RisingEdgeDetector;
 @TeleOp(name = "OneDriver")
 public class TeleopOneDriver extends CommandOpMode {
@@ -49,14 +50,12 @@ public class TeleopOneDriver extends CommandOpMode {
                             armAdjust(gamepad1.dpad_right, gamepad1.dpad_left)));
                 }
             }
-            double heading = robot.drive.getHeading();
-            double x = gamepad1.left_stick_x * cos(heading) - gamepad1.left_stick_y * sin(heading);
-            double y = gamepad1.left_stick_x * sin(heading) + gamepad1.left_stick_y * cos(heading);
+            Vec p = new Vec(gamepad1.left_stick_x, gamepad1.left_stick_y).rotate(robot.drive.getHeading());
             double turn = gamepad1.right_stick_x;
-            if (abs(x) + abs(y) + abs(turn) < 0.05) {
+            if (p.norm() + abs(turn) < 0.05) {
                 robot.drive.setPowers(0, 0, 0);
             } else {
-                robot.drive.setPowers(x, y, turn);
+                robot.drive.setPowers(p.x(), p.y(), turn);
             }
         }, robot.drive));
         scheduler.addListener(

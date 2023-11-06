@@ -52,13 +52,16 @@ public class ThreeWheelLocalizer implements Localizer {
         double p1 = f * enc1.getPosition();
         double p2 = f * enc2.getPosition();
         double p3 = f * enc3.getPosition();
+        System.out.println("Encoder 1 " + p1);
+        System.out.println("Encoder 2 " + p2);
+        System.out.println("Encoder 3 " + p3);
         if (p1 == last1 && p2 == last2 && p3 == last3) {
             vel = new Pose(0, 0, 0);
         } else if (!Double.isNaN(last1)) {
             RealMatrix local = invKin.solve(new Array2DRowRealMatrix(new double[][]{{p1 - last1}, {p2 - last2}, {p3 - last3}}));
             RealMatrix rot = new Array2DRowRealMatrix(new double[][] {
                     {cos(pos.h()), -sin(pos.h()), 0}, {sin(pos.h()), cos(pos.h()), 0}, {0, 0, 1}});
-            double dA = local.getEntry(0, 2);
+            double dA = local.getEntry(2, 0);
             RealMatrix integ;
             if (abs(dA) < EPS) {
                 integ = new Array2DRowRealMatrix(new double[][] {
@@ -69,9 +72,9 @@ public class ThreeWheelLocalizer implements Localizer {
             }
             RealMatrix dPos = rot.multiply(integ.multiply(local));
             RealMatrix nVel = rot.multiply(local).scalarMultiply(1 / (time - lastTime));
-            pos = new Pose(pos.x() + dPos.getEntry(0, 0), pos.y() + dPos.getEntry(0, 1),
-                    pos.h() + dPos.getEntry(0, 2));
-            vel = new Pose(nVel.getEntry(0, 0), nVel.getEntry(0, 1), nVel.getEntry(0, 2));
+            pos = new Pose(pos.x() + dPos.getEntry(0, 0), pos.y() + dPos.getEntry(1, 0),
+                    pos.h() + dPos.getEntry(2, 0));
+            vel = new Pose(nVel.getEntry(0, 0), nVel.getEntry(1, 0), nVel.getEntry(2, 0));
         }
         last1 = p1;
         last2 = p2;
