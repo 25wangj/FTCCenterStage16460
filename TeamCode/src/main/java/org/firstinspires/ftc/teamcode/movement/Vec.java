@@ -1,22 +1,19 @@
 package org.firstinspires.ftc.teamcode.movement;
 import static java.lang.Math.*;
 public class Vec {
-    private double x;
-    private double y;
+    public final double x;
+    public final double y;
     public Vec(double x, double y) {
         this.x = x;
         this.y = y;
-    }
-    public double x() {
-        return x;
-    }
-    public double y() {
-        return y;
     }
     public double norm() {
         return Math.sqrt(x * x + y * y);
     }
     public Vec normalize() {
+        if (x == 0 && y == 0) {
+            return new Vec(0, 0);
+        }
         return mult(1 / norm());
     }
     public Vec mult(double a) {
@@ -30,5 +27,8 @@ public class Vec {
     }
     public double angle() {
         return atan2(y, x);
+    }
+    public static Vec dir(double a) {
+        return new Vec(cos(a), sin(a));
     }
 }

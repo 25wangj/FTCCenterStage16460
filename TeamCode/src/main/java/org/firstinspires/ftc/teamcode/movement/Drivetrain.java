@@ -1,20 +1,28 @@
 package org.firstinspires.ftc.teamcode.movement;
 import org.firstinspires.ftc.teamcode.command.Subsystem;
+import org.firstinspires.ftc.teamcode.control.AsymConstraints;
 public abstract class Drivetrain implements Subsystem {
-    private boolean auto;
+    protected AsymConstraints moveConstraints;
+    protected AsymConstraints turnConstraints;
     protected Trajectory traj;
     protected Localizer localizer;
-    public Drivetrain(boolean auto) {
+    private boolean auto;
+    public Drivetrain(boolean auto, AsymConstraints moveConstraints, AsymConstraints turnConstraints) {
         this.auto = auto;
+        this.moveConstraints = moveConstraints;
+        this.turnConstraints = turnConstraints;
     }
-    public Pose getPose() {
+    public Pose pose() {
         return localizer.pos();
     }
-    public Pose getVel() {
+    public Pose vel() {
         return localizer.vel();
     }
     public void setPose(Pose p) {
         localizer.setPose(p);
+    }
+    public Trajectory getTrajectory() {
+        return traj;
     }
     public void setTrajectory(Trajectory traj) {
         this.traj = traj;

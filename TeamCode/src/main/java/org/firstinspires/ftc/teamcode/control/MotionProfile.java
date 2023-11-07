@@ -6,13 +6,13 @@ public abstract class MotionProfile {
     protected double xf;
     protected double tf;
     protected double vf;
-    public abstract double getX(double t);
-    public abstract double getV(double t);
-    public abstract double getA(double t);
-    public double getTf() {
+    public abstract double pos(double t);
+    public abstract double vel(double t);
+    public abstract double accel(double t);
+    public double tf() {
         return tf;
     }
-    public double getTi() {
+    public double ti() {
         return ti;
     }
 }

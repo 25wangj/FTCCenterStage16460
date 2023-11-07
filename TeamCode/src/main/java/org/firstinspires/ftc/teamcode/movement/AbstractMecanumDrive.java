@@ -16,10 +16,8 @@ public abstract class AbstractMecanumDrive extends Drivetrain {
     private PidfController xPid;
     private PidfController yPid;
     private PidfController turnPid;
-    private AsymConstraints moveConstraints;
-    private AsymConstraints turnConstraints;
     public AbstractMecanumDrive(double trackWidth, double ks, double kv, double ka, PidCoefficients moveCoeffs, PidCoefficients turnCoeffs, AsymConstraints moveConstraints, AsymConstraints turnConstraints, boolean auto) {
-        super(auto);
+        super(auto, moveConstraints, turnConstraints);
         this.trackWidth = trackWidth;
         this.ks = ks;
         this.kv = kv;
@@ -27,8 +25,6 @@ public abstract class AbstractMecanumDrive extends Drivetrain {
         xPid = new PidfController(moveCoeffs);
         yPid = new PidfController(moveCoeffs);
         turnPid = new PidfController(turnCoeffs);
-        this.moveConstraints = moveConstraints;
-        this.turnConstraints = turnConstraints;
     }
     public void setPowers(double x, double y, double t) {
         double d = max(abs(x) + abs(y) + abs(t), 1);
@@ -41,17 +37,17 @@ public abstract class AbstractMecanumDrive extends Drivetrain {
     public void follow(double time) {
         Pose setPos = traj.pos(time);
         Pose setVel = traj.vel(time);
-        Pose acPos = getPose();
-        Pose acVel = getVel();
-        Vec locPosError = setPos.vec().combo(1, acPos.vec(), -1).rotate(-acPos.h());
-        Vec locVelError = setVel.vec().combo(1, acVel.vec(), -1).rotate(-acPos.h());
-        Vec locVel = setVel.vec().rotate(-acPos.h());
-        Vec locAccel = traj.accel(time).rotate(-acPos.h());
-        xPid.derivUpdate(time, locVelError.x(), locPosError.x());
-        yPid.derivUpdate(time, locVelError.y(), locPosError.y());
-        turnPid.derivUpdate(time, setVel.h() - acVel.h(), ((setPos.h() - acPos.h()) % (2 * PI) + 3 * PI) % (2 * PI) - PI);
-        setPowers(xPid.get() + kv * locVel.x() + ka * locAccel.x(), yPid.get() + kv * locVel.y() + ka * locAccel.y(),
-                turnPid.get() + kv * setVel.h() / trackWidth);
+        Pose acPos = pose();
+        Pose acVel = vel();
+        Vec locPosError = setPos.vec().combo(1, acPos.vec(), -1).rotate(-acPos.h);
+        Vec locVelError = setVel.vec().combo(1, acVel.vec(), -1).rotate(-acPos.h);
+        Vec locVel = setVel.vec().rotate(-acPos.h);
+        Vec locAccel = traj.accel(time).rotate(-acPos.h);
+        xPid.derivUpdate(time, locVelError.x, locPosError.x);
+        yPid.derivUpdate(time, locVelError.y, locPosError.y);
+        turnPid.derivUpdate(time, setVel.h - acVel.h, ((setPos.h - acPos.h) % (2 * PI) + 3 * PI) % (2 * PI) - PI);
+        setPowers(xPid.get() + kv * locVel.x + ka * locAccel.x, yPid.get() + kv * locVel.y + ka * locAccel.y,
+                turnPid.get() + kv * setVel.h / trackWidth);
     }
     private double offset(double a, double b) {
         return a + signum(a) * b;

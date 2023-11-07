@@ -4,7 +4,7 @@ public class SymProfile extends AsymProfile {
         super(constraints, ti, xi, vi, xf, vf);
     }
     public static SymProfile extendSym(MotionProfile p, SymConstraints constraints, double t, double xf, double vf) {
-        return new SymProfile(constraints, t, p.getX(t), p.getV(t), xf, vf);
+        return new SymProfile(constraints, t, p.pos(t), p.vel(t), xf, vf);
     }
     public static SymProfile extendSym(MotionProfile p, SymConstraints constraints, double xf, double vf) {
         return extendSym(p, constraints, p.tf, xf, vf);

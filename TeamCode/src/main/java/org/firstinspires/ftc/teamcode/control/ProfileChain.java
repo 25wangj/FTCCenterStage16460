@@ -1,12 +1,13 @@
 package org.firstinspires.ftc.teamcode.control;
 import java.util.ArrayList;
+import java.util.List;
 public class ProfileChain extends MotionProfile {
-    ArrayList<MotionProfile> profiles = new ArrayList<>();
-    public ProfileChain(ArrayList<MotionProfile> profiles) {
+    List<MotionProfile> profiles = new ArrayList<>();
+    public ProfileChain(List<MotionProfile> profiles) {
         for (int i = 0; i < profiles.size(); i++) {
-            if (i < profiles.size() - 1 && profiles.get(i).getX(profiles.get(i + 1).ti) != profiles.get(i + 1).xi) {
+            if (i < profiles.size() - 1 && profiles.get(i).pos(profiles.get(i + 1).ti) != profiles.get(i + 1).xi) {
                 throw new IllegalArgumentException("Discontinuous positions");
-            } else if (i < profiles.size() - 1 && profiles.get(i).getV(profiles.get(i + 1).ti) != profiles.get(i + 1).vi) {
+            } else if (i < profiles.size() - 1 && profiles.get(i).vel(profiles.get(i + 1).ti) != profiles.get(i + 1).vi) {
                 throw new IllegalArgumentException("Discontinuous velocities");
             }  else if (i < profiles.size() - 1 && profiles.get(i).tf > profiles.get(i + 1).ti) {
                 throw new IllegalArgumentException("Profiles interfere");
@@ -34,43 +35,44 @@ public class ProfileChain extends MotionProfile {
         this.vf = profile.vf;
     }
     @Override
-    public double getX(double t) {
+    public double pos(double t) {
         for (int i = 0; i < profiles.size() - 1; i++) {
             if (t < profiles.get(i + 1).ti) {
-                return profiles.get(i).getX(t);
+                return profiles.get(i).pos(t);
             }
         }
-        return profiles.get(profiles.size() - 1).getX(t);
+        return profiles.get(profiles.size() - 1).pos(t);
     }
     @Override
-    public double getV(double t) {
+    public double vel(double t) {
         for (int i = 0; i < profiles.size() - 1; i++) {
             if (t < profiles.get(i + 1).ti) {
-                return profiles.get(i).getV(t);
+                return profiles.get(i).vel(t);
             }
         }
-        return profiles.get(profiles.size() - 1).getV(t);
+        return profiles.get(profiles.size() - 1).vel(t);
     }
     @Override
-    public double getA(double t) {
+    public double accel(double t) {
         for (int i = 0; i < profiles.size() - 1; i++) {
             if (t < profiles.get(i + 1).ti) {
-                return profiles.get(i).getA(t);
+                return profiles.get(i).accel(t);
             }
         }
-        return profiles.get(profiles.size() - 1).getA(t);
+        return profiles.get(profiles.size() - 1).accel(t);
     }
-    public ArrayList<MotionProfile> getProfiles() {
+    public List<MotionProfile> getProfiles() {
         return profiles;
     }
-    public void add(MotionProfile newProfile) {
+    public ProfileChain add(MotionProfile newProfile) {
         if (newProfile.tf < tf) {
             throw new IllegalArgumentException("Profiles interfere");
-        } else if (newProfile.xi != getX(newProfile.ti)) {
+        } else if (newProfile.xi != pos(newProfile.ti)) {
             throw new IllegalArgumentException("Discontinuous positions");
-        } else if (newProfile.vi != getV(newProfile.ti)) {
+        } else if (newProfile.vi != vel(newProfile.ti)) {
             throw new IllegalArgumentException("Discontinuous velocities");
         }
         profiles.add(newProfile);
+        return this;
     }
 }

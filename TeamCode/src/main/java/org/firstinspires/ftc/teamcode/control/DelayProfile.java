@@ -9,19 +9,19 @@ public class DelayProfile extends MotionProfile {
         this.vf = vi;
     }
     @Override
-    public double getX(double t) {
+    public double pos(double t) {
         return xi + vi * (t - ti);
     }
     @Override
-    public double getV(double t) {
+    public double vel(double t) {
         return vi;
     }
     @Override
-    public double getA(double t) {
+    public double accel(double t) {
         return 0;
     }
     public static DelayProfile extendDelay(MotionProfile p, double ti, double dt) {
-        return new DelayProfile(ti, p.getX(ti), p.getV(ti), dt);
+        return new DelayProfile(ti, p.pos(ti), p.vel(ti), dt);
     }
     public static DelayProfile extendDelay(MotionProfile p, double dt) {
         return extendDelay(p, p.tf, dt);

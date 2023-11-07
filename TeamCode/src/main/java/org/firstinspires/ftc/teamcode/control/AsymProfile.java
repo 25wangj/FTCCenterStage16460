@@ -29,7 +29,7 @@ public class AsymProfile extends MotionProfile {
         }
     }
     @Override
-    public double getX(double t) {
+    public double pos(double t) {
         if (t < ti) {
             return xi + vi * (t - ti);
         } else if (t < t1) {
@@ -42,20 +42,20 @@ public class AsymProfile extends MotionProfile {
         return xf + vf * (t - tf);
     }
     @Override
-    public double getV(double t) {
+    public double vel(double t) {
         if (t < ti) {
             return vi;
         } else if (t < t1) {
-            return vi + sgn * c.ai * (t - t1);
+            return vi + sgn * c.ai * (t - ti);
         } else if (t < t2) {
             return sgn * c.vm;
         } else if (t < tf) {
-            return vf + sgn * c.ai * (t - tf);
+            return vf - sgn * c.af * (t - tf);
         }
         return vf;
     }
     @Override
-    public double getA(double t) {
+    public double accel(double t) {
         if (t > ti && t <= t1) {
             return sgn * c.ai;
         } else if (t > t2 && t < tf) {
@@ -64,7 +64,7 @@ public class AsymProfile extends MotionProfile {
         return 0;
     }
     public static AsymProfile extendAsym(MotionProfile p, AsymConstraints c, double ti, double xf, double vf) {
-        return new AsymProfile(c, ti, p.getX(ti), p.getV(ti), xf, vf);
+        return new AsymProfile(c, ti, p.pos(ti), p.vel(ti), xf, vf);
     }
     public static AsymProfile extendAsym(MotionProfile p, AsymConstraints c, double xf, double vf) {
         return extendAsym(p, c, p.tf, xf, vf);

@@ -14,7 +14,7 @@ public class Intake implements Subsystem {
     public static final double rollerDown = 0.37;
     public static final double gateClosed = 0.45;
     public static final double gateOpen = 0.73;
-    public static final double gatePush = 0.68;
+    public static final double gatePush = 0.66;
     public static final double gateUp = 0.87;
     public static final double intakeEject = -1;
     public static final double intakeClosed = 0.7;
@@ -30,7 +30,7 @@ public class Intake implements Subsystem {
     }
     public Command twiddle() {
         return new SeqCommand(new WaitCommand(t -> setGate(gatePush), 0.15, this),
-                new WaitCommand(t -> setGate(0.78), 0.15, this),
+                new WaitCommand(t -> setGate(0.81), 0.15, this),
                 new WaitCommand(t -> setGate(gateOpen), 0.1, this));
     }
     public void setRoller(double pos) {

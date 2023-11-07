@@ -63,21 +63,21 @@ public class LiftTest extends CommandOpMode {
         armProfile = new DelayProfile(0, 0, 0, 0);
         big = false;
         Subsystem lift = (t, b) -> {
-            liftPidf.set(liftProfile.getX(t));
-            armPidf.set(armProfile.getX(t));
+            liftPidf.set(liftProfile.pos(t));
+            armPidf.set(armProfile.pos(t));
             double leftX = liftL.getCurrentPosition();
             double rightX = liftR.getCurrentPosition();
-            liftPidf.update(t, leftX + rightX, liftProfile.getV(t), liftProfile.getA(t));
-            armPidf.update(t,leftX - rightX, armProfile.getV(t), armProfile.getA(t));
+            liftPidf.update(t, leftX + rightX, liftProfile.vel(t), liftProfile.accel(t));
+            armPidf.update(t,leftX - rightX, armProfile.vel(t), armProfile.accel(t));
             //liftL.setPower(liftPidf.get() + armPidf.get());
             //liftR.setPower(liftPidf.get() - armPidf.get());
             liftPidf.setConstants(new PidCoefficients(liftKp, liftKi, 0), x -> liftKgs + x[0] * liftKgd + x[2] * liftKa);
             armPidf.setConstants(new PidCoefficients(armKp, armKi, 0), x -> x[2] * armKa);
             big = gamepad1.right_trigger > 0.2;
             telemetry.addData("Lift Actual Position", leftX + rightX);
-            telemetry.addData("Lift Estimated Position", liftProfile.getX(t));
+            telemetry.addData("Lift Estimated Position", liftProfile.pos(t));
             telemetry.addData("Arm Actual Position", leftX - rightX);
-            telemetry.addData("Arm Estimated Position", armProfile.getX(t));
+            telemetry.addData("Arm Estimated Position", armProfile.pos(t));
         };
         scheduler.register(lift);
         scheduler.schedule(FnCommand.repeat(d -> {
@@ -87,30 +87,30 @@ public class LiftTest extends CommandOpMode {
                         double armAdjust = armAdjust(gamepad1.dpad_left, gamepad1.dpad_right);
                         if (liftAdjust != 0) {
                             liftProfile = SymProfile.extendSym(liftProfile, new SymConstraints(vAdjust, aAdjust),
-                                    t, clip(liftProfile.getX(t) + liftAdjust, liftLow, liftHigh), 0);
+                                    t, clip(liftProfile.pos(t) + liftAdjust, liftLow, liftHigh), 0);
                         }
                         if (armAdjust != 0) {
                             armProfile = SymProfile.extendSym(liftProfile, new SymConstraints(vAdjust, aAdjust),
-                                    t, clip(armProfile.getX(t) + armAdjust, liftLow, liftHigh), 0);
+                                    t, clip(armProfile.pos(t) + armAdjust, liftLow, liftHigh), 0);
                         }
                     }, lift));}}));
         scheduler.addListener(
                 RisingEdgeDetector.listen(() -> gamepad1.a, new FnCommand(t ->
                         liftProfile = AsymProfile.extendAsym(liftProfile, new AsymConstraints(liftVm, liftAi, liftAf), t,
-                        min(liftProfile.getX(t) + (liftHigh - liftLow) / (big ? 1 : 8), liftHigh), 0),
-                        t -> {}, (t, b) -> {}, t -> t > max(liftProfile.getTf(), armProfile.getTf()), lift)),
+                        min(liftProfile.pos(t) + (liftHigh - liftLow) / (big ? 1 : 8), liftHigh), 0),
+                        t -> {}, (t, b) -> {}, t -> t > max(liftProfile.tf(), armProfile.tf()), lift)),
                 RisingEdgeDetector.listen(() -> gamepad1.b, new FnCommand(t ->
                         liftProfile = AsymProfile.extendAsym(liftProfile, new AsymConstraints(liftVm, liftAi, liftAf), t,
-                        max(liftProfile.getX(t) - (liftHigh - liftLow) / (big ? 1 : 8), liftLow), 0),
-                        t -> {}, (t, b) -> {}, t -> t > max(liftProfile.getTf(), armProfile.getTf()), lift)),
+                        max(liftProfile.pos(t) - (liftHigh - liftLow) / (big ? 1 : 8), liftLow), 0),
+                        t -> {}, (t, b) -> {}, t -> t > max(liftProfile.tf(), armProfile.tf()), lift)),
                 RisingEdgeDetector.listen(() -> gamepad1.x, new FnCommand(t ->
                         armProfile = AsymProfile.extendAsym(armProfile, new AsymConstraints(armVm, armAi, armAf), t,
-                        min(armProfile.getX(t) + (armRight - armLeft) / (big ? 1 : 8), armRight), 0),
-                        t -> {}, (t, b) -> {}, t -> t > max(liftProfile.getTf(), armProfile.getTf()), lift)),
+                        min(armProfile.pos(t) + (armRight - armLeft) / (big ? 1 : 8), armRight), 0),
+                        t -> {}, (t, b) -> {}, t -> t > max(liftProfile.tf(), armProfile.tf()), lift)),
                 RisingEdgeDetector.listen(() -> gamepad1.y, new FnCommand(t ->
                         armProfile = AsymProfile.extendAsym(armProfile, new AsymConstraints(armVm, armAi, armAf), t,
-                        max(armProfile.getX(t) - (armRight - armLeft) / (big ? 1 : 8), armLeft), 0),
-                        t -> {}, (t, b) -> {}, t -> t > max(liftProfile.getTf(), armProfile.getTf()), lift)));
+                        max(armProfile.pos(t) - (armRight - armLeft) / (big ? 1 : 8), armLeft), 0),
+                        t -> {}, (t, b) -> {}, t -> t > max(liftProfile.tf(), armProfile.tf()), lift)));
     }
     private static double liftAdjust(boolean up, boolean down) {
         if (up) {

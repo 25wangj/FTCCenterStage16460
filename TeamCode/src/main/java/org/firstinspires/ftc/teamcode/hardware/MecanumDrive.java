@@ -18,16 +18,16 @@ import org.firstinspires.ftc.teamcode.sensors.Encoder;
 public class MecanumDrive extends AbstractMecanumDrive {
     public static final double wheelRad = 0.689;
     public static final int ticks = 8192;
-    public static final double parDist = 11.01;
+    public static final double parDist = 11.08;
     public static final double perpDist = 4.85;
     public static final double trackWidth = 12;
-    public static final double driveKv = 0;
-    public static final double driveKa = 0;
+    public static final double driveKv = 0.0135;
+    public static final double driveKa = 0.003;
     public static final double driveKs = 0;
     public static final PidCoefficients moveCoeffs = new PidCoefficients(0, 0, 0);
     public static final PidCoefficients turnCoeffs = new PidCoefficients(0, 0, 0);
-    public static final AsymConstraints moveConstraints = new AsymConstraints(0, 0, 0);
-    public static final AsymConstraints turnConstraints = new AsymConstraints(0, 0, 0);
+    public static final AsymConstraints moveConstraints = new AsymConstraints(60, 80, 100);
+    public static final AsymConstraints turnConstraints = new AsymConstraints(10, 15, 20);
     public static final RevHubOrientationOnRobot orientation = new RevHubOrientationOnRobot
             (RevHubOrientationOnRobot.LogoFacingDirection.LEFT, RevHubOrientationOnRobot.UsbFacingDirection.UP);
     private final Object gyroLock = new Object();
@@ -36,20 +36,20 @@ public class MecanumDrive extends AbstractMecanumDrive {
     private double heading = 0;
     private double offset = 0;
     public MecanumDrive(LinearOpMode opMode, boolean auto) {
-        super(trackWidth, driveKs, driveKa, driveKv, moveCoeffs, turnCoeffs, moveConstraints, turnConstraints, auto);
+        super(trackWidth, driveKs, driveKv, driveKa, moveCoeffs, turnCoeffs, moveConstraints, turnConstraints, auto);
         fr = opMode.hardwareMap.get(DcMotorEx.class, "fr");
         fl = opMode.hardwareMap.get(DcMotorEx.class, "fl");
         br = opMode.hardwareMap.get(DcMotorEx.class, "br");
         bl = opMode.hardwareMap.get(DcMotorEx.class, "bl");
-        fr.setDirection(DcMotorSimple.Direction.REVERSE);
-        br.setDirection(DcMotorSimple.Direction.REVERSE);
+        fl.setDirection(DcMotorSimple.Direction.REVERSE);
+        bl.setDirection(DcMotorSimple.Direction.REVERSE);
         fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         fl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         br.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         bl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         if (auto) {
-            Encoder par1 = new Encoder(opMode.hardwareMap.get(DcMotorEx.class, "br"));
-            Encoder par2 = new Encoder(opMode.hardwareMap.get(DcMotorEx.class, "fl"));
+            Encoder par1 = new Encoder(opMode.hardwareMap.get(DcMotorEx.class, "fl"));
+            Encoder par2 = new Encoder(opMode.hardwareMap.get(DcMotorEx.class, "br"));
             Encoder perp = new Encoder(opMode.hardwareMap.get(DcMotorEx.class, "bl"));
             par2.setDirection(Encoder.Direction.REVERSE);
             perp.setDirection(Encoder.Direction.REVERSE);

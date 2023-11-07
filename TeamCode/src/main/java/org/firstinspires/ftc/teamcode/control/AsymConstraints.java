@@ -8,4 +8,7 @@ public class AsymConstraints {
         this.ai = ai;
         this.af = af;
     }
+    public AsymConstraints scale(double f) {
+        return new AsymConstraints(vm / f, ai / f, af / f);
+    }
 }

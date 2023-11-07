@@ -8,8 +8,6 @@ import static org.firstinspires.ftc.teamcode.hardware.RobotStateMachine.robotSta
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.command.CommandOpMode;
 import org.firstinspires.ftc.teamcode.command.FnCommand;
-import org.firstinspires.ftc.teamcode.command.SeqCommand;
-import org.firstinspires.ftc.teamcode.command.WaitCommand;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
 import org.firstinspires.ftc.teamcode.movement.Vec;
 import org.firstinspires.ftc.teamcode.sensors.RisingEdgeDetector;
@@ -21,10 +19,10 @@ public class TeleopOneDriver extends CommandOpMode {
     @Override
     public void initOpMode() {
         robot = new Robot(this, false);
-        robot.drive.setHeading(lastPose.h() + lastSide * PI / 2);
+        robot.drive.setHeading(lastPose.h + lastSide * PI / 2);
         scheduler.addListener(RisingEdgeDetector.listen(() -> gamepad1.ps, FnCommand.once(t -> robot.drive.setHeading(0))));
         scheduler.schedule(FnCommand.repeat(t -> {
-            if (gamepad1.right_trigger > 0.8) {
+            if (gamepad1.right_trigger > 0.9) {
                 if (robot.stateMachine.state() == INTAKE_OPEN) {
                     robot.stateMachine.transition(EJECT_OPEN);
                 } else if (robot.stateMachine.state() == INTAKE_CLOSED) {
@@ -35,9 +33,9 @@ public class TeleopOneDriver extends CommandOpMode {
             } else if (robot.stateMachine.state() == EJECT_CLOSED) {
                 robot.stateMachine.transition(INTAKE_CLOSED);
             }
-            if (gamepad1.left_trigger > 0.2) {
+            if (gamepad1.left_trigger > 0.1) {
                 if (robot.stateMachine.state() == INTAKE_CLOSED || robot.stateMachine.state() == INTAKE_OPEN) {
-                    robot.intake.setRoller(scale(gamepad1.left_trigger, 0.2, 1, rollerDown, rollerUp));
+                    robot.intake.setRoller(scale(gamepad1.left_trigger, 0.1, 1, rollerDown, rollerUp));
                 }
             } else if (robot.stateMachine.state() == INTAKE_CLOSED || robot.stateMachine.state() == INTAKE_OPEN) {
                 robot.intake.setRoller(rollerDown);
@@ -46,16 +44,16 @@ public class TeleopOneDriver extends CommandOpMode {
                 if (robot.stateMachine.state() == INTAKE_OPEN) {
                     scheduler.schedule(robot.intake.twiddle());
                 } else if (robot.stateMachine.state() == DEPOSIT || robot.stateMachine.state() == RETRACT) {
-                    scheduler.schedule(robot.lift.adjust(liftAdjust(gamepad1.dpad_up, gamepad1.dpad_down),
-                            armAdjust(gamepad1.dpad_right, gamepad1.dpad_left)));
+                    //scheduler.schedule(robot.lift.adjust(liftAdjust(gamepad1.dpad_up, gamepad1.dpad_down),
+                    //        armAdjust(gamepad1.dpad_right, gamepad1.dpad_left)));
                 }
             }
-            Vec p = new Vec(gamepad1.left_stick_x, gamepad1.left_stick_y).rotate(robot.drive.getHeading());
-            double turn = gamepad1.right_stick_x;
+            Vec p = new Vec(-gamepad1.left_stick_y, -gamepad1.left_stick_x).rotate(-robot.drive.getHeading());
+            double turn = -gamepad1.right_stick_x;
             if (p.norm() + abs(turn) < 0.05) {
                 robot.drive.setPowers(0, 0, 0);
             } else {
-                robot.drive.setPowers(p.x(), p.y(), turn);
+                robot.drive.setPowers(p.x, p.y, turn);
             }
         }, robot.drive));
         scheduler.addListener(
@@ -77,7 +75,7 @@ public class TeleopOneDriver extends CommandOpMode {
                     }})),
                 RisingEdgeDetector.listen(() -> (gamepad1.a || gamepad1.b || gamepad1.x || gamepad1.y), FnCommand.once(t -> {
                     double liftPos = liftPos(gamepad1.b, gamepad1.x, gamepad1.y);
-                    double armPos = armPos(gamepad1.left_trigger > 0.2, gamepad1.right_trigger > 0.2);
+                    double armPos = armPos(gamepad1.left_trigger > 0.1, gamepad1.right_trigger > 0.1);
                     if (robot.stateMachine.state() == INTAKE_OPEN) {
                         if (robot.stateMachine.transition(DEPOSIT, liftPos, armPos)) {
                             lastLiftPos = liftPos;

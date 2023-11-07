@@ -24,9 +24,9 @@ public class ThreeWheelLocalizer implements Localizer {
         this.enc3 = enc3;
         this.f = f;
         invKin = new LUDecomposition(new Array2DRowRealMatrix(new double[][] {
-                {cos(p1.h()), sin(p1.h()), p1.x() * sin(p1.h()) - p1.y() * cos(p1.h())},
-                {cos(p2.h()), sin(p2.h()), p2.x() * sin(p2.h()) - p2.y() * cos(p2.h())},
-                {cos(p3.h()), sin(p3.h()), p3.x() * sin(p3.h()) - p3.y() * cos(p3.h())}})).getSolver();
+                {cos(p1.h), sin(p1.h), p1.x * sin(p1.h) - p1.y * cos(p1.h)},
+                {cos(p2.h), sin(p2.h), p2.x * sin(p2.h) - p2.y * cos(p2.h)},
+                {cos(p3.h), sin(p3.h), p3.x * sin(p3.h) - p3.y * cos(p3.h)}})).getSolver();
         if (!invKin.isNonSingular()) {
             throw new IllegalArgumentException("Pose cannot be uniquely determined");
         }
@@ -60,7 +60,7 @@ public class ThreeWheelLocalizer implements Localizer {
         } else if (!Double.isNaN(last1)) {
             RealMatrix local = invKin.solve(new Array2DRowRealMatrix(new double[][]{{p1 - last1}, {p2 - last2}, {p3 - last3}}));
             RealMatrix rot = new Array2DRowRealMatrix(new double[][] {
-                    {cos(pos.h()), -sin(pos.h()), 0}, {sin(pos.h()), cos(pos.h()), 0}, {0, 0, 1}});
+                    {cos(pos.h), -sin(pos.h), 0}, {sin(pos.h), cos(pos.h), 0}, {0, 0, 1}});
             double dA = local.getEntry(2, 0);
             RealMatrix integ;
             if (abs(dA) < EPS) {
@@ -72,8 +72,8 @@ public class ThreeWheelLocalizer implements Localizer {
             }
             RealMatrix dPos = rot.multiply(integ.multiply(local));
             RealMatrix nVel = rot.multiply(local).scalarMultiply(1 / (time - lastTime));
-            pos = new Pose(pos.x() + dPos.getEntry(0, 0), pos.y() + dPos.getEntry(1, 0),
-                    pos.h() + dPos.getEntry(2, 0));
+            pos = new Pose(pos.x + dPos.getEntry(0, 0), pos.y + dPos.getEntry(1, 0),
+                    pos.h + dPos.getEntry(2, 0));
             vel = new Pose(nVel.getEntry(0, 0), nVel.getEntry(1, 0), nVel.getEntry(2, 0));
         }
         last1 = p1;

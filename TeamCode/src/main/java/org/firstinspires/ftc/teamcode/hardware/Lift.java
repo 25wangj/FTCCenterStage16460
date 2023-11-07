@@ -56,28 +56,28 @@ public class Lift implements Subsystem {
         armProfile = new DelayProfile(0, 0, 0, 0);
     }
     public double restTime() {
-        return max(liftProfile.getTf(), armProfile.getTf());
+        return max(liftProfile.tf(), armProfile.tf());
     }
     public Command adjust(double liftAdjust, double armAdjust) {
         return FnCommand.once(t -> {
             if (liftAdjust != 0) {
                 liftProfile = SymProfile.extendSym(liftProfile, adjustConstraints, t,
-                        clip(liftProfile.getX(t) + liftAdjust, liftLow, liftHigh), 0);
+                        clip(liftProfile.pos(t) + liftAdjust, liftLow, liftHigh), 0);
             }
             if (armAdjust != 0) {
                 armProfile = SymProfile.extendSym(armProfile, adjustConstraints, t,
-                        clip(armProfile.getX(t) + armAdjust, armLeft, armRight), 0);}}, this);
+                        clip(armProfile.pos(t) + armAdjust, armLeft, armRight), 0);}}, this);
     }
     public Command goTo(double liftPos, double armPos) {
         return new FnCommand(t -> {
             liftProfile = AsymProfile.extendAsym(liftProfile, liftConstraints, t, liftPos, 0);
-            armProfile = AsymProfile.extendAsym(armProfile, armConstraints, liftProfile.getTf(), armPos, 0);
+            armProfile = AsymProfile.extendAsym(armProfile, armConstraints, liftProfile.tf(), armPos, 0);
         }, t -> {}, (t, b) -> {}, t -> t > restTime(), this);
     }
     public Command goBack() {
         return new FnCommand(t -> {
             armProfile = AsymProfile.extendAsym(armProfile, armConstraints, t, 0, 0);
-            liftProfile = AsymProfile.extendAsym(liftProfile, liftConstraints, armProfile.getTf(), 0, 0);
+            liftProfile = AsymProfile.extendAsym(liftProfile, liftConstraints, armProfile.tf(), 0, 0);
         }, t -> {}, (t, b) -> {}, t -> t > restTime(), this);
     }
     public void setClaw(double pos) {
@@ -85,12 +85,12 @@ public class Lift implements Subsystem {
     }
     @Override
     public void update(double time, boolean active) {
-        liftPidf.set(liftProfile.getX(time));
-        armPidf.set(armProfile.getX(time));
+        liftPidf.set(liftProfile.pos(time));
+        armPidf.set(armProfile.pos(time));
         double leftX = liftL.getCurrentPosition();
         double rightX = liftR.getCurrentPosition();
-        liftPidf.update(time, leftX + rightX, liftProfile.getV(time), liftProfile.getA(time));
-        armPidf.update(time,leftX - rightX, armProfile.getV(time), armProfile.getA(time));
+        liftPidf.update(time, leftX + rightX, liftProfile.vel(time), liftProfile.accel(time));
+        armPidf.update(time,leftX - rightX, armProfile.vel(time), armProfile.accel(time));
         liftL.setPower(liftPidf.get() + armPidf.get());
         liftR.setPower(liftPidf.get() - armPidf.get());
     }

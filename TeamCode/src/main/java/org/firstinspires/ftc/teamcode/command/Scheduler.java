@@ -62,11 +62,11 @@ public class Scheduler {
                 }
             }
             for (Command command : finished) {
-                command.end(time, false);
                 for (Subsystem subsystem : command.getSubsystems()) {
                     subsystems.put(subsystem, null);
                 }
                 commands.remove(command);
+                command.end(time, false);
             }
         }
     }
@@ -77,8 +77,9 @@ public class Scheduler {
         }
         for (Subsystem subsystem : command.getSubsystems()) {
             if (!subsystems.containsKey(subsystem)) {
+                throw new IllegalArgumentException("Unregistered subsystem");
             } else if (subsystems.get(subsystem) != null) {
-                if (subsystems.get(subsystem).isCancelable()) {
+                if (subsystems.get(subsystem).cancelable) {
                     toCancel.add(subsystems.get(subsystem));
                 } else {
                     return false;
