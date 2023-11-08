@@ -1,11 +1,10 @@
 package org.firstinspires.ftc.teamcode.command;
 public class ParCommand extends Command {
-    public Command[] commands;
-    public boolean[] dones;
-    public boolean[] justDones;
-    public int numDone;
+    private Command[] commands;
+    private boolean[] dones;
+    private boolean[] justDones;
+    private int numDone;
     public ParCommand(Command... commands) {
-        System.out.println("Parallel command constructed");
         for (Command command : commands) {
             for (Subsystem subsystem : command.getSubsystems()) {
                 if (subsystems.contains(subsystem)) {
@@ -19,7 +18,6 @@ public class ParCommand extends Command {
     }
     @Override
     public void init(double time) {
-        System.out.println("Parallel command initialized");
         dones = new boolean[commands.length];
         justDones = new boolean[commands.length];
         numDone = 0;
@@ -30,13 +28,11 @@ public class ParCommand extends Command {
     @Override
     public void run(double time) {
         for (int i = 0; i < commands.length; i++) {
-            if (!dones[i]) {
-                if (justDones[i]) {
-                    commands[i].end(time, false);
-                    justDones[i] = false;
-                } else {
-                    commands[i].run(time);
-                }
+            if (justDones[i]) {
+                commands[i].end(time, false);
+                justDones[i] = false;
+            } else if (!dones[i]) {
+                commands[i].run(time);
             }
         }
     }
@@ -48,11 +44,10 @@ public class ParCommand extends Command {
                     commands[i].end(time, true);
                 }
             }
-        } else {
-            for (int i = 0; i < commands.length; i++) {
-                if (justDones[i]) {
-                    commands[i].end(time, false);
-                }
+        }
+        for (int i = 0; i < commands.length; i++) {
+            if (justDones[i]) {
+                commands[i].end(time, false);
             }
         }
     }

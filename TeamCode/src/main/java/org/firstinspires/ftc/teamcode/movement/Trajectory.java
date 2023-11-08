@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.movement;
 import static java.lang.Math.*;
 import org.firstinspires.ftc.teamcode.control.AsymConstraints;
 import org.firstinspires.ftc.teamcode.control.AsymProfile;
+import org.firstinspires.ftc.teamcode.control.DelayProfile;
 import org.firstinspires.ftc.teamcode.control.MotionProfile;
 public class Trajectory {
     private Path path;
@@ -13,19 +14,28 @@ public class Trajectory {
     public Trajectory(Path path, AsymConstraints moveConstraints, double vi, double vf, double hi) {
         this.path = path;
         len = path.length();
-        moveProfile = new AsymProfile(moveConstraints, 0, 0, vi, len, vf);
+        if (len == 0) {
+            moveProfile = new DelayProfile(0, 0, 0, 0);
+        } else {
+            moveProfile = new AsymProfile(moveConstraints.scale(1 / len), 0, 0, vi / len, 1, vf / len);
+        }
         this.hi = hi - path.vel(0).angle();
     }
     public Trajectory(Path path, AsymConstraints moveConstraints, AsymConstraints turnConstraints, double vi, double vf, double hi, double hf) {
         this.path = path;
-        moveProfile = new AsymProfile(moveConstraints.scale(1 / len), 0, 0, vi / len, 1, vf / len);
+        len = path.length();
+        if (len == 0) {
+            moveProfile = new DelayProfile(0, 0, 0, 0);
+        } else {
+            moveProfile = new AsymProfile(moveConstraints.scale(1 / len), 0, 0, vi / len, 1, vf / len);
+        }
         turnProfile = new AsymProfile(turnConstraints, 0, hi, 0, hf, 0);
     }
     public void setTi(double ti) {
         this.ti = ti;
     }
     public Pose pos(double t) {
-        double x = moveProfile.pos(t - ti) / path.length();
+        double x = moveProfile.pos(t - ti);
         double h;
         if (turnProfile == null) {
             h = hi + path.vel(x).angle();

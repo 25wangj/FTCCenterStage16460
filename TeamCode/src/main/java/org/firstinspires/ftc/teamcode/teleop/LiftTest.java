@@ -90,8 +90,8 @@ public class LiftTest extends CommandOpMode {
                                     t, clip(liftProfile.pos(t) + liftAdjust, liftLow, liftHigh), 0);
                         }
                         if (armAdjust != 0) {
-                            armProfile = SymProfile.extendSym(liftProfile, new SymConstraints(vAdjust, aAdjust),
-                                    t, clip(armProfile.pos(t) + armAdjust, liftLow, liftHigh), 0);
+                            armProfile = SymProfile.extendSym(armProfile, new SymConstraints(vAdjust, aAdjust),
+                                    t, clip(armProfile.pos(t) + armAdjust, armLeft, armRight), 0);
                         }
                     }, lift));}}));
         scheduler.addListener(

@@ -68,6 +68,7 @@ public class Scheduler {
                 commands.remove(command);
                 command.end(time, false);
             }
+            finished.clear();
         }
     }
     public boolean schedule(Command command) {

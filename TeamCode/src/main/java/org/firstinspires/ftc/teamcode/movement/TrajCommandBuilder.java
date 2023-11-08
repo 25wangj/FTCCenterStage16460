@@ -43,6 +43,9 @@ public class TrajCommandBuilder {
         pos = new Pose(pos.vec().combo(1, tangent, vi * t), pos.h);
         trajCommands.add(new WaitCommand(t));
     }
+    public void turn(double h) {
+        lineTo(new Pose(pos.vec(), h));
+    }
     public void lineTo(Pose end) {
         trajCommands.add(trajCommand(new Line(pos.vec(), end.vec()), end.h));
     }
@@ -60,6 +63,12 @@ public class TrajCommandBuilder {
     }
     public void lineToY(double y) {
         trajCommands.add(trajCommand(Line.extendY(pos.vec(), tangent, y)));
+    }
+    public void splineTo(Pose end, double t, double v) {
+        trajCommands.add(trajCommand(new Spline(pos.vec(), tangent.mult(v), end.vec(), Vec.dir(end.h).mult(v)), end.h));
+    }
+    public void splineTo(Vec end, double t, double v) {
+        trajCommands.add(trajCommand(new Spline(pos.vec(), tangent.mult(v), end, Vec.dir(t).mult(v))));
     }
     private Command trajCommand(Path p) {
         Trajectory traj = new Trajectory(p, moveConstraints, vi, vf, pos.h);

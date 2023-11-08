@@ -7,7 +7,7 @@ public class Spline implements Path {
     private CubicSpline x;
     private CubicSpline y;
     private CubicSplineInterpolator arcLen;
-    private Spline(Vec xi, Vec vi, Vec xf, Vec vf) {
+    public Spline(Vec xi, Vec vi, Vec xf, Vec vf) {
         x = new CubicSpline(xi.x, vi.x, xf.x, vf.x);
         y = new CubicSpline(xi.y, xi.y, xf.y, xf.y);
         double[] tArr = new double[APPROX_PTS + 1];

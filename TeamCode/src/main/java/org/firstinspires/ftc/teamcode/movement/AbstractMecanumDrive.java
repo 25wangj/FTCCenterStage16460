@@ -47,7 +47,7 @@ public abstract class AbstractMecanumDrive extends Drivetrain {
         yPid.derivUpdate(time, locVelError.y, locPosError.y);
         turnPid.derivUpdate(time, setVel.h - acVel.h, ((setPos.h - acPos.h) % (2 * PI) + 3 * PI) % (2 * PI) - PI);
         setPowers(xPid.get() + kv * locVel.x + ka * locAccel.x, yPid.get() + kv * locVel.y + ka * locAccel.y,
-                turnPid.get() + kv * setVel.h / trackWidth);
+                turnPid.get() + kv * setVel.h * trackWidth);
     }
     private double offset(double a, double b) {
         return a + signum(a) * b;

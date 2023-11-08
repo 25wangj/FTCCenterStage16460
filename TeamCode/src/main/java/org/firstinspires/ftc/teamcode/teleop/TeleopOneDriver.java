@@ -22,7 +22,14 @@ public class TeleopOneDriver extends CommandOpMode {
         robot.drive.setHeading(lastPose.h + lastSide * PI / 2);
         scheduler.addListener(RisingEdgeDetector.listen(() -> gamepad1.ps, FnCommand.once(t -> robot.drive.setHeading(0))));
         scheduler.schedule(FnCommand.repeat(t -> {
-            if (gamepad1.right_trigger > 0.9) {
+            if (gamepad1.left_trigger > 0.1) {
+                if (robot.stateMachine.state() == INTAKE_CLOSED || robot.stateMachine.state() == INTAKE_OPEN) {
+                    robot.intake.setRoller(scale(gamepad1.left_trigger, 0.1, 1, rollerDown, rollerUp));
+                }
+            } else if (robot.stateMachine.state() == INTAKE_CLOSED || robot.stateMachine.state() == INTAKE_OPEN) {
+                robot.intake.setRoller(rollerDown);
+            }
+            if (gamepad1.dpad_down) {
                 if (robot.stateMachine.state() == INTAKE_OPEN) {
                     robot.stateMachine.transition(EJECT_OPEN);
                 } else if (robot.stateMachine.state() == INTAKE_CLOSED) {
@@ -33,23 +40,17 @@ public class TeleopOneDriver extends CommandOpMode {
             } else if (robot.stateMachine.state() == EJECT_CLOSED) {
                 robot.stateMachine.transition(INTAKE_CLOSED);
             }
-            if (gamepad1.left_trigger > 0.1) {
-                if (robot.stateMachine.state() == INTAKE_CLOSED || robot.stateMachine.state() == INTAKE_OPEN) {
-                    robot.intake.setRoller(scale(gamepad1.left_trigger, 0.1, 1, rollerDown, rollerUp));
-                }
-            } else if (robot.stateMachine.state() == INTAKE_CLOSED || robot.stateMachine.state() == INTAKE_OPEN) {
-                robot.intake.setRoller(rollerDown);
-            }
             if (gamepad1.dpad_up || gamepad1.dpad_down || gamepad1.dpad_left || gamepad1.dpad_right) {
-                if (robot.stateMachine.state() == INTAKE_OPEN) {
+                if (gamepad1.dpad_up && robot.stateMachine.state() == INTAKE_OPEN) {
                     scheduler.schedule(robot.intake.twiddle());
                 } else if (robot.stateMachine.state() == DEPOSIT || robot.stateMachine.state() == RETRACT) {
                     //scheduler.schedule(robot.lift.adjust(liftAdjust(gamepad1.dpad_up, gamepad1.dpad_down),
                     //        armAdjust(gamepad1.dpad_right, gamepad1.dpad_left)));
                 }
             }
-            Vec p = new Vec(-gamepad1.left_stick_y, -gamepad1.left_stick_x).rotate(-robot.drive.getHeading());
-            double turn = -gamepad1.right_stick_x;
+            double f = gamepad1.right_stick_button ? 0.25 : 1;
+            Vec p = new Vec(-gamepad1.left_stick_y * f, -gamepad1.left_stick_x * f).rotate(-robot.drive.getHeading());
+            double turn = -gamepad1.right_stick_x * f;
             if (p.norm() + abs(turn) < 0.05) {
                 robot.drive.setPowers(0, 0, 0);
             } else {

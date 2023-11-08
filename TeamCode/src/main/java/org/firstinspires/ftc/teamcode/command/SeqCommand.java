@@ -1,8 +1,7 @@
 package org.firstinspires.ftc.teamcode.command;
-
 public class SeqCommand extends Command {
-    public Command[] commands;
-    public int index;
+    private Command[] commands;
+    private int index;
     public SeqCommand(Command... commands) {
         for (Command command : commands) {
             subsystems.addAll(command.getSubsystems());
