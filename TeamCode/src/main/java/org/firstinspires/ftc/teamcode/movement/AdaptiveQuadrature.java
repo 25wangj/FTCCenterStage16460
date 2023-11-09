@@ -21,7 +21,7 @@ public class AdaptiveQuadrature {
         if (abs(i1 + i2 - i) < eps) {
             return i1 + i2;
         }
-        return adaptive(a, m, eps, i1) + adaptive(a, m, eps, i2);
+        return adaptive(a, m, eps, i1) + adaptive(m, b, eps, i2);
     }
     private double quadrature(double a, double b) {
         double s = f.applyAsDouble(a + (b - a) * x[0]) * w[0];

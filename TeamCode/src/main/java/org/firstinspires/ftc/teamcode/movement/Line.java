@@ -12,7 +12,7 @@ public class Line implements Path {
     }
     @Override
     public Vec vel(double t) {
-        return dir.normalize();
+        return dir;
     }
     @Override
     public Vec accel(double t) {

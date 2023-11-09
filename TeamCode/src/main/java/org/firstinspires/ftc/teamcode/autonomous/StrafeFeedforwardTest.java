@@ -1,5 +1,6 @@
-package org.firstinspires.ftc.teamcode.teleop;
+package org.firstinspires.ftc.teamcode.autonomous;
 import static java.lang.Math.*;
+import static org.firstinspires.ftc.teamcode.hardware.MecanumDrive.*;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import org.firstinspires.ftc.teamcode.command.CommandOpMode;
@@ -10,12 +11,11 @@ import org.firstinspires.ftc.teamcode.control.SymProfile;
 import org.firstinspires.ftc.teamcode.hardware.MecanumDrive;
 import org.firstinspires.ftc.teamcode.movement.Pose;
 @Config
-@Autonomous(name = "MoveFeedforwardTest")
-public class MoveFeedforwardTest extends CommandOpMode {
-    public static double dist = 96;
-    public static double kv = 0;
-    public static double ka = 0;
-    public static double vm = 60;
+@Autonomous(name = "StrafeFeedforwardTest")
+public class StrafeFeedforwardTest extends CommandOpMode {
+    public static double dist = 72;
+    public static double mult = 1.35;
+    public static double vm = 40;
     public static double am = 60;
     private boolean forwards = true;
     private MotionProfile profile;
@@ -33,13 +33,13 @@ public class MoveFeedforwardTest extends CommandOpMode {
                 }
                 forwards = !forwards;
             }
-            drive.setPowers(kv * profile.vel(t) + ka * profile.accel(t), 0, 0);
+            drive.setPowers(0, mult / strafeMult * (driveKv * profile.vel(t) + driveKa * profile.accel(t)), 0);
             Pose p = drive.pose();
             Pose v = drive.vel();
             telemetry.addData("X", p.x);
             telemetry.addData("Y", p.y);
             telemetry.addData("Heading", p.h % (2 * PI));
-            telemetry.addData("Actual velocity", v.vec().rotate(-p.h).x);
+            telemetry.addData("Actual velocity", v.vec().rotate(-p.h).y);
             telemetry.addData("Target velocity", profile.vel(t));
         }));
     }

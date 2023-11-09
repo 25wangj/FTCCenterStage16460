@@ -52,9 +52,6 @@ public class ThreeWheelLocalizer implements Localizer {
         double p1 = f * enc1.getPosition();
         double p2 = f * enc2.getPosition();
         double p3 = f * enc3.getPosition();
-        System.out.println("Encoder 1 " + p1);
-        System.out.println("Encoder 2 " + p2);
-        System.out.println("Encoder 3 " + p3);
         if (p1 == last1 && p2 == last2 && p3 == last3) {
             vel = new Pose(0, 0, 0);
         } else if (!Double.isNaN(last1)) {

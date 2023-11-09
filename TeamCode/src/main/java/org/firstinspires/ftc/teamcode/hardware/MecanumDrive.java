@@ -24,10 +24,11 @@ public class MecanumDrive extends AbstractMecanumDrive {
     public static final double driveKv = 0.0135;
     public static final double driveKa = 0.003;
     public static final double driveKs = 0;
-    public static final PidCoefficients moveCoeffs = new PidCoefficients(0, 0, 0);
-    public static final PidCoefficients turnCoeffs = new PidCoefficients(0, 0, 0);
-    public static final AsymConstraints moveConstraints = new AsymConstraints(60, 80, 100);
-    public static final AsymConstraints turnConstraints = new AsymConstraints(10, 15, 20);
+    public static final double strafeMult = 1.35;
+    public static final PidCoefficients moveCoeffs = new PidCoefficients(0.2, 0, 0);
+    public static final PidCoefficients turnCoeffs = new PidCoefficients(0.5, 0, 0);
+    public static final AsymConstraints moveConstraints = new AsymConstraints(60, 80, 80);
+    public static final AsymConstraints turnConstraints = new AsymConstraints(6, 12, 15);
     public static final RevHubOrientationOnRobot orientation = new RevHubOrientationOnRobot
             (RevHubOrientationOnRobot.LogoFacingDirection.LEFT, RevHubOrientationOnRobot.UsbFacingDirection.UP);
     private final Object gyroLock = new Object();
@@ -36,7 +37,7 @@ public class MecanumDrive extends AbstractMecanumDrive {
     private double heading = 0;
     private double offset = 0;
     public MecanumDrive(LinearOpMode opMode, boolean auto) {
-        super(trackWidth, driveKs, driveKv, driveKa, moveCoeffs, turnCoeffs, moveConstraints, turnConstraints, auto);
+        super(trackWidth, driveKs, driveKv, driveKa, strafeMult, moveCoeffs, turnCoeffs, moveConstraints, turnConstraints, auto);
         fr = opMode.hardwareMap.get(DcMotorEx.class, "fr");
         fl = opMode.hardwareMap.get(DcMotorEx.class, "fl");
         br = opMode.hardwareMap.get(DcMotorEx.class, "br");

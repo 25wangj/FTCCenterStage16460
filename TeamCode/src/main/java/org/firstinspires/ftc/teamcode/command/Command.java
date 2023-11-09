@@ -1,8 +1,12 @@
 package org.firstinspires.ftc.teamcode.command;
+import java.util.Arrays;
 import java.util.HashSet;
 public abstract class Command {
     protected HashSet<Subsystem> subsystems = new HashSet<>();
     protected boolean cancelable = true;
+    public Command(Subsystem... systems) {
+        subsystems.addAll(Arrays.asList(systems));
+    }
     public abstract void init(double time);
     public abstract void run(double time);
     public abstract void end(double time, boolean canceled);

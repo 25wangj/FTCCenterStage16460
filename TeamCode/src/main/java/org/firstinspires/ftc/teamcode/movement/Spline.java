@@ -17,6 +17,7 @@ public class Spline implements Path {
         for (int i = 0; i <= APPROX_PTS; i++) {
             double t = (double)i / APPROX_PTS;
             tArr[i] = integrator.integrate(0, t, EPS);
+            System.out.println("Point at " + t + ": " + tArr[i]);
             xArr[i] = t;
             vArr[i] = 1 / sqrt(x.vel(t) * x.vel(t) + y.vel(t) * y.vel(t));
         }

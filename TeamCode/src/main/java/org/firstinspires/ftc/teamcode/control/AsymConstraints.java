@@ -9,6 +9,6 @@ public class AsymConstraints {
         this.af = af;
     }
     public AsymConstraints scale(double f) {
-        return new AsymConstraints(vm / f, ai / f, af / f);
+        return new AsymConstraints(vm * f, ai * f, af * f);
     }
 }
