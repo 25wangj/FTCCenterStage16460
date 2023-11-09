@@ -7,20 +7,8 @@ public class Line implements Path {
         dir = end.combo(1, start, -1);
     }
     @Override
-    public Vec pos(double t) {
-        return start.combo(1, dir, t);
-    }
-    @Override
-    public Vec vel(double t) {
-        return dir;
-    }
-    @Override
-    public Vec accel(double t) {
-        return new Vec(0, 0);
-    }
-    @Override
-    public double angVel(double t) {
-        return 0;
+    public PathState state(double t) {
+        return new PathState(start.combo(1, dir, t), dir, 0);
     }
     @Override
     public double length() {

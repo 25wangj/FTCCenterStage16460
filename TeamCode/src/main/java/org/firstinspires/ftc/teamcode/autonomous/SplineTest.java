@@ -21,14 +21,15 @@ public class SplineTest extends CommandOpMode {
         scheduler.register(drive);
         Command traj = new TrajCommandBuilder(drive, new Pose(0, 0, 0))
                 .splineTo(new Vec(48, 36), 0, 60)
-                .pause(0.25)
+                .pause(1)
+                .setTangent(PI)
                 .splineTo(new Vec(0, 0), PI, 60)
-                .pause(0.25)
+                .pause(1)
                 .build(scheduler);
         scheduler.schedule(new RepeatCommand(traj));
         scheduler.schedule(FnCommand.repeat(t -> {
             Pose p = drive.pose();
-            Pose ap = drive.getTrajectory().pos(t);
+            Pose ap = drive.getTrajectory().state(t).pos;
             telemetry.addData("X", p.x);
             telemetry.addData("Y", p.y);
             telemetry.addData("Heading", p.h % (2 * PI));

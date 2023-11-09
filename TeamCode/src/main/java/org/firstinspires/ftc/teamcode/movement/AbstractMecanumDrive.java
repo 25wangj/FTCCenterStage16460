@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.teamcode.movement;
 import static java.lang.Math.*;
+
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.canvas.Canvas;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import org.firstinspires.ftc.teamcode.control.AsymConstraints;
 import org.firstinspires.ftc.teamcode.control.PidCoefficients;
@@ -28,29 +32,36 @@ public abstract class AbstractMecanumDrive extends Drivetrain {
         yPid = new PidfController(moveCoeffs);
         turnPid = new PidfController(turnCoeffs);
     }
-    public void setPowers(double x, double y, double t) {
-        double d = max(abs(x) + abs(strafeMult * y) + abs(t), 1);
-        fr.setPower(offset((x + strafeMult * y + t) / d, ks));
-        fl.setPower(offset((x - strafeMult * y - t) / d, ks));
-        br.setPower(offset((x - strafeMult * y + t) / d, ks));
-        bl.setPower(offset((x + strafeMult * y - t) / d, ks));
+    public void setPowers(Vec v, double t) {
+        double d = max(abs(v.x) + abs(strafeMult * v.y) + abs(t), 1);
+        fr.setPower(offset((v.x + strafeMult * v.y + t) / d, ks));
+        fl.setPower(offset((v.x - strafeMult * v.y - t) / d, ks));
+        br.setPower(offset((v.x - strafeMult * v.y + t) / d, ks));
+        bl.setPower(offset((v.x + strafeMult * v.y - t) / d, ks));
     }
     @Override
     public void follow(double time) {
-        Pose setPos = traj.pos(time);
-        Pose setVel = traj.vel(time);
+        TrajectoryState state = traj.state(time);
         Pose acPos = pose();
         Pose acVel = vel();
-        Vec locPosError = acPos.vec().combo(1, setPos.vec(), -1).rotate(-acPos.h);
-        Vec locVelError = acVel.vec().combo(1, setVel.vec(), -1).rotate(-acPos.h);
-        Vec locVel = setVel.vec().rotate(-acPos.h);
-        Vec locAccel = traj.accel(time).rotate(-acPos.h);
+        Vec locPosError = acPos.vec().combo(1, state.pos.vec(), -1).rotate(-acPos.h);
+        Vec locVelError = acVel.vec().combo(1, state.pos.vec(), -1).rotate(-acPos.h);
+        Vec locVel = state.vel.vec().rotate(-acPos.h);
+        Vec locAccel = state.accel.rotate(-acPos.h);
         xPid.derivUpdate(time, locVelError.x, locPosError.x);
         yPid.derivUpdate(time, locVelError.y, locPosError.y);
-        turnPid.derivUpdate(time, acVel.h - setVel.h, ((acPos.h - setPos.h) % (2 * PI) + 3 * PI) % (2 * PI) - PI);
-        System.out.println("Turn Power" + turnPid.get());
-        setPowers(xPid.get() + kv * locVel.x + ka * locAccel.x, strafeMult * (yPid.get() + kv * locVel.y + ka * locAccel.y),
-                turnPid.get() + kv * setVel.h * trackWidth);
+        turnPid.derivUpdate(time, acVel.h - state.vel.h, ((acPos.h - state.pos.h) % (2 * PI) + 3 * PI) % (2 * PI) - PI);
+        setPowers(new Vec(xPid.get(), yPid.get()).combo(1, locVel, kv).combo(1, locAccel, ka),
+                turnPid.get() + kv * state.vel.h * trackWidth);
+        TelemetryPacket packet = new TelemetryPacket();
+        Canvas canv = packet.fieldOverlay();
+        canv.setStroke("blue");
+        canv.strokeCircle(acPos.x, acPos.y, 10);
+        canv.strokeLine(acPos.x, acPos.y, acPos.x + 10 * cos(acPos.h), acPos.y + 10 * sin(acPos.h));
+        canv.setStroke("green");
+        canv.strokeCircle(state.pos.x, state.pos.y, 10);
+        canv.strokeLine(state.pos.x, state.pos.y, state.pos.x + 10 * cos(state.pos.h), state.pos.y + 10 * sin(state.pos.h));
+        FtcDashboard.getInstance().sendTelemetryPacket(packet);
     }
     private double offset(double a, double b) {
         return a + signum(a) * b;

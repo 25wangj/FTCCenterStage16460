@@ -11,16 +11,9 @@ public class TurnTrajectory implements Trajectory {
         profile = new AsymProfile(constraints, ti, pos.h, 0, h, 0);
     }
     @Override
-    public Pose pos(double t) {
-        return new Pose(pos, profile.pos(t - ti));
-    }
-    @Override
-    public Pose vel(double t) {
-        return new Pose(0, 0, profile.vel(t - ti));
-    }
-    @Override
-    public Vec accel(double t) {
-        return new Vec(0, 0);
+    public TrajectoryState state(double t) {
+        return new TrajectoryState(new Pose(pos, profile.pos(t - ti)),
+                new Pose(0, 0, profile.vel(t - ti)), new Vec(0, 0));
     }
     @Override
     public void setTi(double ti) {

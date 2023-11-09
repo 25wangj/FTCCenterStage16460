@@ -10,6 +10,7 @@ import org.firstinspires.ftc.teamcode.control.SymConstraints;
 import org.firstinspires.ftc.teamcode.control.SymProfile;
 import org.firstinspires.ftc.teamcode.hardware.MecanumDrive;
 import org.firstinspires.ftc.teamcode.movement.Pose;
+import org.firstinspires.ftc.teamcode.movement.Vec;
 @Config
 @Autonomous(name = "TurnFeedforwardTest")
 public class TurnFeedforwardTest extends CommandOpMode {
@@ -27,7 +28,7 @@ public class TurnFeedforwardTest extends CommandOpMode {
             if (profile == null || t > profile.tf() + 1) {
                 profile = new SymProfile(new SymConstraints(vm, am), t, 0, 0, angle, 0);
             }
-            drive.setPowers(0, 0, driveKv * profile.vel(t) * width);
+            drive.setPowers(new Vec(0, 0), driveKv * profile.vel(t) * width);
             Pose p = drive.pose();
             Pose v = drive.vel();
             telemetry.addData("X", p.x);

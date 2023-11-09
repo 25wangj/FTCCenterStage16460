@@ -15,8 +15,7 @@ public class PathTrajectory implements Trajectory {
         this.path = path;
         len = path.length();
         moveProfile = new AsymProfile(moveConstraints.scale(1 / len), 0, 0, vi / len, 1, vf / len);
-        System.out.println("Constructed end time " + moveProfile.tf());
-        this.hi = hi - path.vel(0).angle();
+        this.hi = hi - path.state(0).vel.angle();
     }
     public PathTrajectory(Path path, AsymConstraints moveConstraints, AsymConstraints turnConstraints, double vi, double vf, double hi, double hf) {
         this.path = path;
@@ -25,34 +24,21 @@ public class PathTrajectory implements Trajectory {
         turnProfile = new AsymProfile(turnConstraints, 0, hi, 0, hf, 0);
     }
     @Override
-    public Pose pos(double t) {
-        double x = moveProfile.pos(t - ti);
-        //System.out.println("Parameter " + x);
-        double h;
-        if (turnProfile == null) {
-            h = hi + path.vel(x).angle();
-        } else {
-            h = turnProfile.pos(t - ti);
-        }
-        return new Pose(path.pos(x), h);
-    }
-    @Override
-    public Pose vel(double t) {
+    public TrajectoryState state(double t) {
         double x = moveProfile.pos(t - ti);
         double v = moveProfile.vel(t - ti);
+        PathState state = path.state(x);
+        double h;
         double av;
         if (turnProfile == null) {
-            av = path.angVel(x) * v;
+            h = hi + state.vel.angle();
+            av = state.curv * len * v;
         } else {
-            av = turnProfile.vel(x);
+            h = turnProfile.pos(t - ti);
+            av = turnProfile.vel(t - ti);
         }
-        return new Pose(path.vel(x).mult(v), av);
-    }
-    @Override
-    public Vec accel(double t) {
-        double x = moveProfile.pos(t - ti);
-        double v = moveProfile.vel(t - ti);
-        return path.vel(x).combo(moveProfile.accel(t - ti), path.accel(x), v * v);
+        return new TrajectoryState(new Pose(state.pos, h), new Pose(state.vel.mult(v), av),
+                state.vel.combo(moveProfile.accel(t - ti), new Vec(-state.vel.y, state.vel.x), state.curv * len * v * v));
     }
     @Override
     public void setTi(double ti) {

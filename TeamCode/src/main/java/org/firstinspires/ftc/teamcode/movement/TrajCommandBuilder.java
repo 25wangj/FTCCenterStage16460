@@ -127,8 +127,8 @@ public class TrajCommandBuilder {
         vi = vf;
         vf = 0;
         endTimes.add(endTimes.get(endTimes.size() - 1) + traj.tf());
-        pos = new Pose(p.pos(1), pos.h - p.vel(0).angle() + p.vel(1).angle());
-        tangent = p.vel(1).normalize();
+        pos = new Pose(p.state(1).pos, pos.h - p.state(0).vel.angle() + p.state(1).vel.angle());
+        tangent = p.state(1).vel.normalize();
         trajs.add(traj);
         markers.add(new ArrayList<>());
     }
@@ -137,8 +137,8 @@ public class TrajCommandBuilder {
         vi = vf;
         vf = 0;
         endTimes.add(endTimes.get(endTimes.size() - 1) + traj.tf());
-        pos = new Pose(p.pos(1), hf);
-        tangent = p.vel(1).normalize();
+        pos = new Pose(p.state(1).pos, hf);
+        tangent = p.state(1).vel.normalize();
         trajs.add(traj);
         markers.add(new ArrayList<>());
     }

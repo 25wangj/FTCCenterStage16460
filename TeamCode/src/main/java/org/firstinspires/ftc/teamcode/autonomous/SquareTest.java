@@ -21,20 +21,20 @@ public class SquareTest extends CommandOpMode {
         scheduler.register(drive);
         Command traj = new TrajCommandBuilder(drive, new Pose(0, 0, 0))
                 .lineTo(new Vec(dist, 0))
-                .pause(0.25)
+                .pause(0.5)
                 .turn(PI / 2)
                 .lineTo(new Pose(dist, dist, PI))
-                .pause(0.25)
+                .pause(0.5)
                 .lineTo(new Vec(0, dist))
-                .pause(0.25)
+                .pause(0.5)
                 .turn(3 * PI / 2)
                 .lineTo(new Pose(0, 0, 2 * PI))
-                .pause(0.25)
+                .pause(0.5)
                 .build(scheduler);
         scheduler.schedule(new RepeatCommand(traj));
         scheduler.schedule(FnCommand.repeat(t -> {
             Pose p = drive.pose();
-            Pose ap = drive.getTrajectory().pos(t);
+            Pose ap = drive.getTrajectory().state(t).pos;
             telemetry.addData("X", p.x);
             telemetry.addData("Y", p.y);
             telemetry.addData("Heading", p.h % (2 * PI));

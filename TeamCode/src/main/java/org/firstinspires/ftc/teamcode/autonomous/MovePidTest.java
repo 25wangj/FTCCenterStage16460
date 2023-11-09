@@ -33,7 +33,7 @@ public class MovePidTest extends CommandOpMode {
         scheduler.schedule(new RepeatCommand(traj));
         scheduler.schedule(FnCommand.repeat(t -> {
             Pose p = drive.pose();
-            Pose ap = drive.getTrajectory().pos(t);
+            Pose ap = drive.getTrajectory().state(t).pos;
             telemetry.addData("X", p.x);
             telemetry.addData("Y", p.y);
             telemetry.addData("Heading", p.h % (2 * PI));

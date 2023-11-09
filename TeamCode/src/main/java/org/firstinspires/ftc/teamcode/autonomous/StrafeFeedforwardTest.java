@@ -10,6 +10,7 @@ import org.firstinspires.ftc.teamcode.control.SymConstraints;
 import org.firstinspires.ftc.teamcode.control.SymProfile;
 import org.firstinspires.ftc.teamcode.hardware.MecanumDrive;
 import org.firstinspires.ftc.teamcode.movement.Pose;
+import org.firstinspires.ftc.teamcode.movement.Vec;
 @Config
 @Autonomous(name = "StrafeFeedforwardTest")
 public class StrafeFeedforwardTest extends CommandOpMode {
@@ -33,7 +34,7 @@ public class StrafeFeedforwardTest extends CommandOpMode {
                 }
                 forwards = !forwards;
             }
-            drive.setPowers(0, mult / strafeMult * (driveKv * profile.vel(t) + driveKa * profile.accel(t)), 0);
+            drive.setPowers(new Vec(0, mult / strafeMult * (driveKv * profile.vel(t) + driveKa * profile.accel(t))), 0);
             Pose p = drive.pose();
             Pose v = drive.vel();
             telemetry.addData("X", p.x);

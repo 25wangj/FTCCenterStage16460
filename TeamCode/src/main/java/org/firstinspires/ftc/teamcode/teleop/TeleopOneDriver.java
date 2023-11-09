@@ -52,9 +52,9 @@ public class TeleopOneDriver extends CommandOpMode {
             Vec p = new Vec(-gamepad1.left_stick_y * f, -gamepad1.left_stick_x * f).rotate(-robot.drive.getHeading());
             double turn = -gamepad1.right_stick_x * f;
             if (p.norm() + abs(turn) < 0.05) {
-                robot.drive.setPowers(0, 0, 0);
+                robot.drive.setPowers(new Vec(0, 0), 0);
             } else {
-                robot.drive.setPowers(p.x, p.y, turn);
+                robot.drive.setPowers(p, turn);
             }
         }, robot.drive));
         scheduler.addListener(

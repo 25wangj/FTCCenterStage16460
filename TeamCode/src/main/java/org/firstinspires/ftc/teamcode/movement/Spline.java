@@ -9,7 +9,7 @@ public class Spline implements Path {
     private CubicSplineInterpolator arcLen;
     public Spline(Vec xi, Vec vi, Vec xf, Vec vf) {
         x = new CubicSpline(xi.x, vi.x, xf.x, vf.x);
-        y = new CubicSpline(xi.y, xi.y, xf.y, xf.y);
+        y = new CubicSpline(xi.y, vi.y, xf.y, vf.y);
         double[] tArr = new double[APPROX_PTS + 1];
         double[] xArr = new double[APPROX_PTS + 1];
         double[] vArr = new double[APPROX_PTS + 1];
@@ -24,34 +24,13 @@ public class Spline implements Path {
         len = tArr[APPROX_PTS];
         arcLen = new CubicSplineInterpolator(tArr, xArr, vArr);
     }
-    @Override
-    public Vec pos(double t) {
-        double ta = arcLen.get(t);
-        return new Vec(x.pos(ta), y.pos(ta));
-    }
-    @Override
-    public Vec vel(double t) {
-        double ta = arcLen.get(t);
-        return new Vec(x.vel(ta), y.vel(ta)).normalize().mult(len);
-    }
-    @Override
-    public Vec accel(double t) {
-        double ta = arcLen.get(t);
+    @Override public PathState state(double t) {
+        double ta = arcLen.get(t * len);
         double xV = x.vel(ta);
         double yV = y.vel(ta);
-        double xA = x.accel(ta);
-        double yA = y.accel(ta);
-        double sqV = xV * xV + yV * yV;
-        return new Vec(xA, yA).combo(1 / sqV, new Vec(xV, yV), -(xV * xA + yV * yA) / (sqV * sqV));
-    }
-    @Override
-    public double angVel(double t) {
-        double ta = arcLen.get(t);
-        double xV = x.vel(ta);
-        double yV = y.vel(ta);
-        double xA = x.accel(ta);
-        double yA = y.accel(ta);
-        return len * (xA * yV - xV * yA) / pow(xV * xV + yV * yV, 1.5);
+        System.out.println("Curvature " + (xV * y.accel(ta) - x.accel(ta) * yV) / pow(xV * xV + yV * yV, 1.5));
+        return new PathState(new Vec(x.pos(ta), y.pos(ta)), new Vec(xV, yV).normalize().mult(len),
+                (xV * y.accel(ta) - x.accel(ta) * yV) / pow(xV * xV + yV * yV, 1.5));
     }
     @Override
     public double length() {

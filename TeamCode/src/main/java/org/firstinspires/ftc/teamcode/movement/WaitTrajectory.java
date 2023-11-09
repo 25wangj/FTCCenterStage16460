@@ -10,16 +10,9 @@ public class WaitTrajectory implements Trajectory {
         this.vel = vel;
     }
     @Override
-    public Pose pos(double t) {
-        return new Pose(pos.vec().combo(1, vel, t - ti), pos.h);
-    }
-    @Override
-    public Pose vel(double t) {
-        return new Pose(vel, 0);
-    }
-    @Override
-    public Vec accel(double t) {
-        return new Vec(0, 0);
+    public TrajectoryState state(double t) {
+        return new TrajectoryState(new Pose(pos.vec().combo(1, vel, t - ti), pos.h),
+                new Pose(vel, 0), new Vec(0, 0));
     }
     @Override
     public void setTi(double ti) {

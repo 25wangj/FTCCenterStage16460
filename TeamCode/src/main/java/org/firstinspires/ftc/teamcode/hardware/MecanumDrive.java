@@ -25,7 +25,7 @@ public class MecanumDrive extends AbstractMecanumDrive {
     public static final double driveKa = 0.003;
     public static final double driveKs = 0;
     public static final double strafeMult = 1.35;
-    public static final PidCoefficients moveCoeffs = new PidCoefficients(0.2, 0, 0);
+    public static final PidCoefficients moveCoeffs = new PidCoefficients(1, 0, 0);
     public static final PidCoefficients turnCoeffs = new PidCoefficients(0.5, 0, 0);
     public static final AsymConstraints moveConstraints = new AsymConstraints(60, 80, 80);
     public static final AsymConstraints turnConstraints = new AsymConstraints(6, 12, 15);

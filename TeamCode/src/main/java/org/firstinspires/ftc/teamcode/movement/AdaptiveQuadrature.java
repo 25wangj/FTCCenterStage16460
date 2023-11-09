@@ -2,8 +2,8 @@ package org.firstinspires.ftc.teamcode.movement;
 import static java.lang.Math.*;
 import java.util.function.DoubleUnaryOperator;
 public class AdaptiveQuadrature {
-    public static final double[] x = {0.5, 0.5 - sqrt(5 - 2 * sqrt(10d / 7)) / 6, 0.5 - sqrt(5 + 2 * sqrt(10d / 7)) / 6};
-    public static final double[] w = {128d / 255, (322 + 13 * sqrt(70)) / 900, (322 - 13 * sqrt(70) / 900)};
+    public static final double[] x = {0, sqrt(5 - 2 * sqrt(10d / 7)) / 3, sqrt(5 + 2 * sqrt(10d / 7)) / 3};
+    public static final double[] w = {128d / 225, (322 + 13 * sqrt(70)) / 900, (322 - 13 * sqrt(70)) / 900};
     private DoubleUnaryOperator f;
     public AdaptiveQuadrature(DoubleUnaryOperator f) {
         this.f = f;
@@ -24,10 +24,12 @@ public class AdaptiveQuadrature {
         return adaptive(a, m, eps, i1) + adaptive(m, b, eps, i2);
     }
     private double quadrature(double a, double b) {
-        double s = f.applyAsDouble(a + (b - a) * x[0]) * w[0];
+        double m = (a + b) / 2;
+        double d = (b - a) / 2;
+        double s = f.applyAsDouble(d * x[0] + m) * w[0];
         for (int i = 1; i < x.length; i++) {
-            s += (f.applyAsDouble(a + (b - a) * x[i]) + f.applyAsDouble(b + (a - b) * x[i])) * w[i];
+            s += (f.applyAsDouble(d * x[i] + m) + f.applyAsDouble(-d * x[i] + m)) * w[i];
         }
-        return s;
+        return d * s;
     }
 }
