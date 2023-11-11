@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.hardware;
 import static java.lang.Math.*;
-import androidx.annotation.GuardedBy;
+
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.control.AsymConstraints;
 import org.firstinspires.ftc.teamcode.control.PidCoefficients;
 import org.firstinspires.ftc.teamcode.movement.AbstractMecanumDrive;
 import org.firstinspires.ftc.teamcode.movement.ThreeWheelLocalizer;
-import org.firstinspires.ftc.teamcode.sensors.Encoder;
+import org.firstinspires.ftc.teamcode.movement.Encoder;
 public class MecanumDrive extends AbstractMecanumDrive {
     public static final double wheelRad = 0.689;
     public static final int ticks = 8192;

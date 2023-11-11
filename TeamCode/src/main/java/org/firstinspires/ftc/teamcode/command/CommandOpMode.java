@@ -18,13 +18,11 @@ public abstract class CommandOpMode extends LinearOpMode {
     public void runOpMode() {
         scheduler = new Scheduler();
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        for (LynxModule hub : hardwareMap.getAll(LynxModule.class)) {
-            hub.setBulkCachingMode(AUTO);
-        }
         initOpMode();
         while (!isStarted() && !isStopRequested()) {
             waitOpMode();
             scheduler.run(false);
+            telemetry.update();
         }
         startOpMode();
         while (opModeIsActive() && !done) {

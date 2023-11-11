@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.command.Subsystem;
 import org.firstinspires.ftc.teamcode.command.WaitCommand;
 
 public class Intake implements Subsystem {
-    public static final double rollerUp = 0.30;
+    public static final double rollerUp = 0.26;
     public static final double rollerDown = 0.37;
     public static final double gateClosed = 0.45;
     public static final double gateOpen = 0.73;

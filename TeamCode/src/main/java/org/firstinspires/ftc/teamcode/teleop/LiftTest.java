@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.teleop;
 import static java.lang.Math.*;
 import static com.qualcomm.robotcore.util.Range.*;
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -17,8 +18,9 @@ import org.firstinspires.ftc.teamcode.control.PidCoefficients;
 import org.firstinspires.ftc.teamcode.control.PidfController;
 import org.firstinspires.ftc.teamcode.control.SymConstraints;
 import org.firstinspires.ftc.teamcode.control.SymProfile;
-import org.firstinspires.ftc.teamcode.sensors.RisingEdgeDetector;
+import org.firstinspires.ftc.teamcode.command.RisingEdgeDetector;
 @Config
+@Disabled
 @TeleOp(name = "LiftTest")
 public class LiftTest extends CommandOpMode {
     public static final double liftLow = 160;
@@ -69,8 +71,8 @@ public class LiftTest extends CommandOpMode {
             double rightX = liftR.getCurrentPosition();
             liftPidf.update(t, leftX + rightX, liftProfile.vel(t), liftProfile.accel(t));
             armPidf.update(t,leftX - rightX, armProfile.vel(t), armProfile.accel(t));
-            //liftL.setPower(liftPidf.get() + armPidf.get());
-            //liftR.setPower(liftPidf.get() - armPidf.get());
+            liftL.setPower(liftPidf.get() + armPidf.get());
+            liftR.setPower(liftPidf.get() - armPidf.get());
             liftPidf.setConstants(new PidCoefficients(liftKp, liftKi, 0), x -> liftKgs + x[0] * liftKgd + x[2] * liftKa);
             armPidf.setConstants(new PidCoefficients(armKp, armKi, 0), x -> x[2] * armKa);
             big = gamepad1.right_trigger > 0.2;

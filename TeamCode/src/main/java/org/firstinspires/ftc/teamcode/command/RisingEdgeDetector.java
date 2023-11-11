@@ -1,6 +1,4 @@
-package org.firstinspires.ftc.teamcode.sensors;
-import org.firstinspires.ftc.teamcode.command.Command;
-import org.firstinspires.ftc.teamcode.command.Listener;
+package org.firstinspires.ftc.teamcode.command;
 import java.util.function.BooleanSupplier;
 public class RisingEdgeDetector implements BooleanSupplier {
     private BooleanSupplier condition;

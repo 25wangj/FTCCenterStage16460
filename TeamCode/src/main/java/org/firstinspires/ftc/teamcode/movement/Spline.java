@@ -17,7 +17,6 @@ public class Spline implements Path {
         for (int i = 0; i <= APPROX_PTS; i++) {
             double t = (double)i / APPROX_PTS;
             tArr[i] = integrator.integrate(0, t, EPS);
-            System.out.println("Point at " + t + ": " + tArr[i]);
             xArr[i] = t;
             vArr[i] = 1 / sqrt(x.vel(t) * x.vel(t) + y.vel(t) * y.vel(t));
         }
@@ -28,7 +27,6 @@ public class Spline implements Path {
         double ta = arcLen.get(t * len);
         double xV = x.vel(ta);
         double yV = y.vel(ta);
-        System.out.println("Curvature " + (xV * y.accel(ta) - x.accel(ta) * yV) / pow(xV * xV + yV * yV, 1.5));
         return new PathState(new Vec(x.pos(ta), y.pos(ta)), new Vec(xV, yV).normalize().mult(len),
                 (xV * y.accel(ta) - x.accel(ta) * yV) / pow(xV * xV + yV * yV, 1.5));
     }

@@ -4,7 +4,6 @@ import org.apache.commons.math3.linear.DecompositionSolver;
 import org.apache.commons.math3.linear.LUDecomposition;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
-import org.firstinspires.ftc.teamcode.sensors.Encoder;
 public class ThreeWheelLocalizer implements Localizer {
     private final double EPS = 1e-6;
     private Pose pos = new Pose(0, 0, 0);

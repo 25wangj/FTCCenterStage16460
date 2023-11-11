@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode.teleop;
 import static java.lang.Math.*;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.command.CommandOpMode;
 import org.firstinspires.ftc.teamcode.command.FnCommand;
 import org.firstinspires.ftc.teamcode.command.Subsystem;
-import org.firstinspires.ftc.teamcode.sensors.RisingEdgeDetector;
+import org.firstinspires.ftc.teamcode.command.RisingEdgeDetector;
+@Disabled
 @TeleOp(name = "ServoTest")
 public class ServoTest extends CommandOpMode {
     private Servo servo;

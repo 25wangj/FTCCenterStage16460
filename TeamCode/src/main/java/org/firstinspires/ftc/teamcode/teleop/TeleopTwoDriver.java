@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.command.CommandOpMode;
 import org.firstinspires.ftc.teamcode.command.FnCommand;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
 import org.firstinspires.ftc.teamcode.movement.Vec;
-import org.firstinspires.ftc.teamcode.sensors.RisingEdgeDetector;
+import org.firstinspires.ftc.teamcode.command.RisingEdgeDetector;
 @TeleOp(name = "TwoDriver")
 public class TeleopTwoDriver extends CommandOpMode {
     private Robot robot;
@@ -19,7 +19,7 @@ public class TeleopTwoDriver extends CommandOpMode {
     @Override
     public void initOpMode() {
         robot = new Robot(this, false);
-        robot.drive.setHeading(lastPose.h + lastSide * PI / 2);
+        robot.drive.setHeading(lastPose.h + (lastSide == Side.RED ? PI / 2 : -PI / 2));
         scheduler.addListener(RisingEdgeDetector.listen(() -> gamepad1.ps, FnCommand.once(t -> robot.drive.setHeading(0))));
         scheduler.schedule(FnCommand.repeat(t -> {
             if (gamepad2.left_trigger > 0.1) {
