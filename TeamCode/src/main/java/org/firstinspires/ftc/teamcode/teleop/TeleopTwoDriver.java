@@ -44,8 +44,8 @@ public class TeleopTwoDriver extends CommandOpMode {
                 if (gamepad2.dpad_up && robot.stateMachine.state() == INTAKE_OPEN) {
                     scheduler.schedule(robot.intake.twiddle());
                 } else if (robot.stateMachine.state() == DEPOSIT || robot.stateMachine.state() == RETRACT) {
-                    //scheduler.schedule(robot.lift.adjust(liftAdjust(gamepad2.dpad_up, gamepad2.dpad_down),
-                    //        armAdjust(gamepad2.dpad_right, gamepad2.dpad_left)));
+                    scheduler.schedule(robot.lift.adjust(adjust(gamepad2.dpad_up, gamepad2.dpad_down),
+                            adjust(gamepad2.dpad_right, gamepad2.dpad_left)));
                 }
             }
             double f = gamepad1.right_trigger > 0.1 ? 0.25 : 1;
@@ -83,19 +83,19 @@ public class TeleopTwoDriver extends CommandOpMode {
                             lastArmPos = armPos;
                         }
                     } else if (robot.stateMachine.state() == DEPOSIT || robot.stateMachine.state() == RETRACT) {
-                        if (scheduler.schedule(robot.lift.goTo(liftPos, armPos))) {
+                        if (scheduler.schedule(robot.lift.goTo(liftPos, armPos, 0))) {
                             lastLiftPos = liftPos;
                             lastArmPos = armPos;}}})));
     }
     private static double liftPos(boolean b, boolean x, boolean y) {
         if (b) {
-            return 720;
+            return 730;
         } else if (y) {
             return 1220;
         } else if (x) {
             return liftHigh;
         }
-        return 220;
+        return 240;
     }
     private static double armPos(boolean left, boolean right) {
         if (left) {
@@ -105,19 +105,11 @@ public class TeleopTwoDriver extends CommandOpMode {
         }
         return 0;
     }
-    private static double liftAdjust(boolean up, boolean down) {
-        if (up) {
-            return 10;
-        } else if (down) {
-            return -10;
-        }
-        return 0;
-    }
-    private static double armAdjust(boolean right, boolean left) {
-        if (right) {
-            return 5;
-        } else if (left) {
-            return -5;
+    private static double adjust(boolean p, boolean m) {
+        if (p) {
+            return 15;
+        } else if (m) {
+            return -15;
         }
         return 0;
     }

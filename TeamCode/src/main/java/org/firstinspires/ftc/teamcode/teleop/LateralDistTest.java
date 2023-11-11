@@ -37,7 +37,7 @@ public class LateralDistTest extends CommandOpMode {
                 telemetry.addData("Heading", p.h % (2 * PI));
             } else {
                 telemetry.addData("Raw heading", hFinal);
-                telemetry.addData("Predicted trackwidth", 2 * turns * PI * MecanumDrive.parDist / hFinal);
+                telemetry.addData("Predicted lateral distance", MecanumDrive.parDist * hFinal / (2 * PI * turns));
             }
         }));
     }

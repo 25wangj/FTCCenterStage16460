@@ -20,7 +20,7 @@ import org.firstinspires.ftc.teamcode.control.SymProfile;
 import java.util.function.ToDoubleFunction;
 public class Lift implements Subsystem {
     public static final double liftLow = 140;
-    public static final double liftHigh = 1720;
+    public static final double liftHigh = 1710;
     public static final double armLeft = -360;
     public static final double armRight = 360;
     public static final double clawClosed = 0.7;
@@ -31,7 +31,7 @@ public class Lift implements Subsystem {
     public static final ToDoubleFunction<double[]> armKf = x -> 0.000005 * x[2];
     public static final AsymConstraints liftConstraints = new AsymConstraints(3500, 30000, 20000);
     public static final AsymConstraints armConstraints = new AsymConstraints(3000, 30000, 20000);
-    public static final SymConstraints adjustConstraints = new SymConstraints(100, 1000);
+    public static final SymConstraints adjustConstraints = new SymConstraints(500, 10000);
     private DcMotorEx liftR;
     private DcMotorEx liftL;
     private Servo claw;
@@ -68,10 +68,10 @@ public class Lift implements Subsystem {
                 armProfile = SymProfile.extendSym(armProfile, adjustConstraints, t,
                         clip(armProfile.pos(t) + armAdjust, armLeft, armRight), 0);}}, this);
     }
-    public Command goTo(double liftPos, double armPos) {
+    public Command goTo(double liftPos, double armPos, double delay) {
         return new FnCommand(t -> {
             liftProfile = AsymProfile.extendAsym(liftProfile, liftConstraints, t, liftPos, 0);
-            armProfile = AsymProfile.extendAsym(armProfile, armConstraints, liftProfile.tf(), armPos, 0);
+            armProfile = AsymProfile.extendAsym(armProfile, armConstraints, liftProfile.tf() + delay, armPos, 0);
         }, t -> {}, (t, b) -> {}, t -> t > restTime(), this);
     }
     public Command goBack() {

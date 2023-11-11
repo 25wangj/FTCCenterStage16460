@@ -20,7 +20,7 @@ public class SplineTest extends CommandOpMode {
         drive = new MecanumDrive(this, true);
         scheduler.register(drive);
         Command traj = new TrajCommandBuilder(drive, new Pose(0, 0, 0))
-                .splineTo(new Vec(48, 36), 0, 60)
+                .splineTo(new Vec(48, 36), 0)
                 .pause(1)
                 .setTangent(PI)
                 .splineTo(new Vec(0, 0), PI, 60)

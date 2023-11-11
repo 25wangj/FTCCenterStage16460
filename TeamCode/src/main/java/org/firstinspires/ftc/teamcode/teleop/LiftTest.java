@@ -21,8 +21,8 @@ import org.firstinspires.ftc.teamcode.sensors.RisingEdgeDetector;
 @Config
 @TeleOp(name = "LiftTest")
 public class LiftTest extends CommandOpMode {
-    public static final double liftLow = 140;
-    public static final double liftHigh = 1720;
+    public static final double liftLow = 160;
+    public static final double liftHigh = 1710;
     public static final double armLeft = -360;
     public static final double armRight = 360;
     public static double vAdjust = 200;

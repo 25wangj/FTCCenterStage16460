@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.control;
 import static java.lang.Math.*;
 public class AsymProfile extends MotionProfile {
+    public static final double EPS = 1e-6;
     private AsymConstraints c;
     private double t1;
     private double t2;
@@ -14,8 +15,8 @@ public class AsymProfile extends MotionProfile {
         this.c = c;
         sgn = (xf < xi) ? -1 : 1;
         double v2 = Math.sqrt((2 * c.ai * c.af * abs(xf - xi) + c.af * vi * vi + c.ai * vf * vf) / (c.ai + c.af));
-        if (sgn == 1 && v2 < max(vi, vf) || sgn == -1 && -v2 > min(vi, vf)) {
-            throw new IllegalArgumentException("Impossible profile");
+        if (sgn == 1 && v2 + EPS < max(vi, vf) || sgn == -1 && -v2 - EPS > min(vi, vf)) {
+            throw new IllegalArgumentException("Impossible profile " + min(abs(v2 - max(vi, vf)), abs(v2 + min(vi, vf))));
         }
         if (v2 > c.vm) {
             tf = ti + (2 * abs(xf - xi) + (sgn * c.vm - vi) * (sgn * c.vm - vi) / c.ai +

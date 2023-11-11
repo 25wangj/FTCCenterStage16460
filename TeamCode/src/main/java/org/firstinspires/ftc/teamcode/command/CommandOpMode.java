@@ -7,11 +7,13 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 public abstract class CommandOpMode extends LinearOpMode {
     protected Scheduler scheduler;
-    ElapsedTime clock = new ElapsedTime();
-    double last = 0;
+    private boolean done = false;
+    private ElapsedTime clock = new ElapsedTime();
+    private double last = 0;
     public abstract void initOpMode();
     public void waitOpMode() {}
     public void startOpMode() {}
+    public void endOpMode() {}
     @Override
     public void runOpMode() {
         scheduler = new Scheduler();
@@ -25,13 +27,17 @@ public abstract class CommandOpMode extends LinearOpMode {
             scheduler.run(false);
         }
         startOpMode();
-        while (opModeIsActive()) {
+        while (opModeIsActive() && !done) {
             scheduler.run(true);
             telemetry.addData("Loop speed", 1 / (-last + (last = clock.seconds())));
             telemetry.update();
         }
+        endOpMode();
     }
     public void register(Subsystem... subsystems) {
         scheduler.register(subsystems);
+    }
+    public void end() {
+        done = true;
     }
 }

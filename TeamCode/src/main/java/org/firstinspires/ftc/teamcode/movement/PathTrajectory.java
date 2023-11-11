@@ -38,7 +38,7 @@ public class PathTrajectory implements Trajectory {
             av = turnProfile.vel(t - ti);
         }
         return new TrajectoryState(new Pose(state.pos, h), new Pose(state.vel.mult(v), av),
-                state.vel.combo(moveProfile.accel(t - ti), new Vec(-state.vel.y, state.vel.x), state.curv * len * v * v));
+                state.vel.combo(moveProfile.accel(t - ti), new Vec(state.vel.y, -state.vel.x), state.curv * len * v * v));
     }
     @Override
     public void setTi(double ti) {

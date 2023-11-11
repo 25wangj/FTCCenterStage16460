@@ -54,13 +54,13 @@ public abstract class AbstractMecanumDrive extends Drivetrain {
         setPowers(new Vec(xPid.get(), yPid.get()).combo(1, locVel, kv).combo(1, locAccel, ka),
                 turnPid.get() + kv * state.vel.h * trackWidth);
         TelemetryPacket packet = new TelemetryPacket();
-        Canvas canv = packet.fieldOverlay();
-        canv.setStroke("blue");
-        canv.strokeCircle(acPos.x, acPos.y, 10);
-        canv.strokeLine(acPos.x, acPos.y, acPos.x + 10 * cos(acPos.h), acPos.y + 10 * sin(acPos.h));
-        canv.setStroke("green");
-        canv.strokeCircle(state.pos.x, state.pos.y, 10);
-        canv.strokeLine(state.pos.x, state.pos.y, state.pos.x + 10 * cos(state.pos.h), state.pos.y + 10 * sin(state.pos.h));
+        packet.fieldOverlay()
+                .setStroke("blue")
+                .strokeCircle(acPos.x, acPos.y, 10)
+                .strokeLine(acPos.x, acPos.y, acPos.x + 10 * cos(acPos.h), acPos.y + 10 * sin(acPos.h))
+                .setStroke("green")
+                .strokeCircle(state.pos.x, state.pos.y, 10)
+                .strokeLine(state.pos.x, state.pos.y, state.pos.x + 10 * cos(state.pos.h), state.pos.y + 10 * sin(state.pos.h));
         FtcDashboard.getInstance().sendTelemetryPacket(packet);
     }
     private double offset(double a, double b) {

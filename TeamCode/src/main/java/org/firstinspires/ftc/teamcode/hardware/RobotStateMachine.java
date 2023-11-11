@@ -45,7 +45,7 @@ public class RobotStateMachine {
                 FnCommand.once(t -> {
                     robot.lift.setClaw(clawClosed);
                     robot.intake.setPower(0);}, subsystems),
-                robot.lift.goTo(d[0], d[1])))
+                robot.lift.goTo(d[0], d[1], 0.25)))
                 .addTransition(robotStates.DEPOSIT, robotStates.RETRACT, new SeqCommand(
                         new WaitCommand(t -> robot.lift.setClaw(clawOpen), 0.1, subsystems),
                         new WaitCommand(t -> robot.lift.setClaw(clawClosed), 0.15, subsystems),

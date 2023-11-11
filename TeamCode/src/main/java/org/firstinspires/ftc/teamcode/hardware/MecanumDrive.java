@@ -18,21 +18,21 @@ import org.firstinspires.ftc.teamcode.sensors.Encoder;
 public class MecanumDrive extends AbstractMecanumDrive {
     public static final double wheelRad = 0.689;
     public static final int ticks = 8192;
-    public static final double parDist = 11.08;
+    public static final double parDist = 10.89;
     public static final double perpDist = 4.85;
     public static final double trackWidth = 12;
     public static final double driveKv = 0.0135;
     public static final double driveKa = 0.003;
     public static final double driveKs = 0;
     public static final double strafeMult = 1.35;
-    public static final PidCoefficients moveCoeffs = new PidCoefficients(1, 0, 0);
-    public static final PidCoefficients turnCoeffs = new PidCoefficients(0.5, 0, 0);
+    public static final PidCoefficients moveCoeffs = new PidCoefficients(0.07, 0, 0);
+    public static final PidCoefficients turnCoeffs = new PidCoefficients(2, 0, 0);
     public static final AsymConstraints moveConstraints = new AsymConstraints(60, 80, 80);
-    public static final AsymConstraints turnConstraints = new AsymConstraints(6, 12, 15);
+    public static final AsymConstraints turnConstraints = new AsymConstraints(6, 12, 12);
     public static final RevHubOrientationOnRobot orientation = new RevHubOrientationOnRobot
             (RevHubOrientationOnRobot.LogoFacingDirection.LEFT, RevHubOrientationOnRobot.UsbFacingDirection.UP);
-    private final Object gyroLock = new Object();
-    @GuardedBy("gyroLock")
+    //private final Object gyroLock = new Object();
+    //@GuardedBy("gyroLock")
     private IMU gyro;
     private double heading = 0;
     private double offset = 0;
@@ -57,7 +57,7 @@ public class MecanumDrive extends AbstractMecanumDrive {
             localizer = new ThreeWheelLocalizer(par1, par2, perp, parDist, perpDist, 2 * PI * wheelRad / ticks);
         } else {
             gyro = opMode.hardwareMap.get(IMU.class, "gyro");
-            synchronized (gyroLock) {
+            /*synchronized (gyroLock) {
                 IMU.Parameters parameters = new IMU.Parameters(orientation);
                 gyro.initialize(parameters);
                 gyro.resetYaw();
@@ -70,13 +70,14 @@ public class MecanumDrive extends AbstractMecanumDrive {
                     }
                 }
             });
-            gyroThread.start();
+            gyroThread.start();*/
         }
     }
     public void setHeading(double h) {
         offset = h - heading;
     }
     public double getHeading() {
+        heading = gyro.getRobotOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS).firstAngle;
         return offset + heading;
     }
 }

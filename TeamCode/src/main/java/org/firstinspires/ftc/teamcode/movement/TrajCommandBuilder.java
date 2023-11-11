@@ -1,5 +1,4 @@
 package org.firstinspires.ftc.teamcode.movement;
-import android.util.Pair;
 import org.firstinspires.ftc.teamcode.command.Command;
 import org.firstinspires.ftc.teamcode.command.Scheduler;
 import org.firstinspires.ftc.teamcode.control.AsymConstraints;
@@ -19,7 +18,7 @@ public class TrajCommandBuilder {
     private ArrayList<ArrayList<Command>> markers;
     private ArrayList<ArrayList<Double>> times;
     private ArrayList<Command> globalMarkers;
-    private ArrayList<Pair<Double, Double>> globalTimes;
+    private ArrayList<Double> globalTimes;
     public TrajCommandBuilder(Drivetrain drive, Pose pos) {
         this.drive = drive;
         this.pos = pos;
@@ -57,10 +56,11 @@ public class TrajCommandBuilder {
     }
     public TrajCommandBuilder pause(double t) {
         pos = new Pose(pos.vec().combo(1, tangent, vi * t), pos.h);
-        endTimes.add(endTimes.get(endTimes.size() - 1) + t);
         vf = 0;
+        endTimes.add(endTimes.get(endTimes.size() - 1) + t);
         trajs.add(new WaitTrajectory(pos, tangent.mult(vi), t));
         markers.add(new ArrayList<>());
+        times.add(new ArrayList<>());
         return this;
     }
     public TrajCommandBuilder turn(double h) {
@@ -69,11 +69,12 @@ public class TrajCommandBuilder {
         }
         Trajectory traj = new TurnTrajectory(turnConstraints, pos, h);
         pos = new Pose(pos.vec(), h);
-        endTimes.add(endTimes.get(endTimes.size() - 1) + traj.tf());
+        tangent = Vec.dir(pos.h);
         vf = 0;
-        tangent = Vec.dir(h);
+        endTimes.add(endTimes.get(endTimes.size() - 1) + traj.tf());
         trajs.add(traj);
         markers.add(new ArrayList<>());
+        times.add(new ArrayList<>());
         return this;
     }
     public TrajCommandBuilder lineTo(Pose end) {
@@ -100,6 +101,12 @@ public class TrajCommandBuilder {
         addTraj(Line.extendY(pos.vec(), tangent, y));
         return this;
     }
+    public TrajCommandBuilder splineTo(Pose end, double t) {
+        return splineTo(end, t, end.vec().combo(1, pos.vec(), -1).norm());
+    }
+    public TrajCommandBuilder splineTo(Vec end, double t) {
+        return splineTo(end, t, end.combo(1, pos.vec(), -1).norm());
+    }
     public TrajCommandBuilder splineTo(Pose end, double t, double v) {
         addTraj(new Spline(pos.vec(), tangent.mult(v), end.vec(), Vec.dir(end.h).mult(v)), end.h);
         return this;
@@ -114,7 +121,8 @@ public class TrajCommandBuilder {
     public TrajCommandBuilder marker(double scale, double offset, Command command) {
         if (trajs.isEmpty()) {
             globalMarkers.add(command);
-            globalTimes.add(new Pair<>(scale, offset));
+            globalTimes.add(scale);
+            globalTimes.add(offset);
         } else {
             markers.get(markers.size() - 1).add(command);
             times.get(markers.size() - 1).add((endTimes.get(endTimes.size() - 1) - endTimes.get(endTimes.size() - 2))
@@ -124,28 +132,30 @@ public class TrajCommandBuilder {
     }
     private void addTraj(Path p) {
         Trajectory traj = new PathTrajectory(p, moveConstraints, vi, vf, pos.h);
+        pos = new Pose(p.state(1).pos, pos.h - p.state(0).vel.angle() + p.state(1).vel.angle());
+        tangent = vf == 0 ? Vec.dir(pos.h) : p.state(1).vel.normalize();
         vi = vf;
         vf = 0;
         endTimes.add(endTimes.get(endTimes.size() - 1) + traj.tf());
-        pos = new Pose(p.state(1).pos, pos.h - p.state(0).vel.angle() + p.state(1).vel.angle());
-        tangent = p.state(1).vel.normalize();
         trajs.add(traj);
         markers.add(new ArrayList<>());
+        times.add(new ArrayList<>());
     }
     private void addTraj(Path p, double hf) {
         Trajectory traj = new PathTrajectory(p, moveConstraints, turnConstraints, vi, vf, pos.h, hf);
+        pos = new Pose(p.state(1).pos, hf);
+        tangent = vf == 0 ? Vec.dir(pos.h) : p.state(1).vel.normalize();
         vi = vf;
         vf = 0;
         endTimes.add(endTimes.get(endTimes.size() - 1) + traj.tf());
-        pos = new Pose(p.state(1).pos, hf);
-        tangent = p.state(1).vel.normalize();
         trajs.add(traj);
         markers.add(new ArrayList<>());
+        times.add(new ArrayList<>());
     }
     public Command build(Scheduler scheduler) {
         for (int i = 0; i < globalMarkers.size(); i++) {
             markers.get(0).add(globalMarkers.get(i));
-            times.get(0).add(globalTimes.get(i).first * endTimes.get(endTimes.size() - 1) + globalTimes.get(i).second);
+            times.get(0).add(globalTimes.get(2 * i) * endTimes.get(endTimes.size() - 1) + globalTimes.get(2 * i + 1));
         }
         return new Command(drive) {
             private int index;

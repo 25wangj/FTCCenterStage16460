@@ -17,7 +17,7 @@ public class Robot {
         opMode.register(drive, intake, lift);
         if (auto) {
             intake.setGate(gateUp);
-            intake.setRoller(rollerDown);
+            intake.setRoller(rollerUp);
             lift.setClaw(clawOpen);
         } else {
             intake.setPower(intakeOpen);
