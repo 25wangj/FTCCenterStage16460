@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.control;
 import java.util.function.ToDoubleFunction;
-
 public class PidfController {
     private PidCoefficients coeffs;
     ToDoubleFunction<double[]> kf;

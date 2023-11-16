@@ -1,10 +1,11 @@
 package org.firstinspires.ftc.teamcode.command;
 import android.util.Pair;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Supplier;
 public class SwitchCommand<T> extends Command {
     private Command command;
-    private HashMap<T, Command> map;
+    private Map<T, Command> map;
     private Supplier<T> decide;
     public SwitchCommand(Supplier<T> decide, Pair<T, Command>... pairs) {
         this.decide = decide;

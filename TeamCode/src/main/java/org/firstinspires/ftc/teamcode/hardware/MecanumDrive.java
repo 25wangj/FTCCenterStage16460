@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.hardware;
 import static java.lang.Math.*;
-
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -21,8 +20,8 @@ public class MecanumDrive extends AbstractMecanumDrive {
     public static final double parDist = 10.89;
     public static final double perpDist = 4.85;
     public static final double trackWidth = 12;
-    public static final double driveKv = 0.0135;
-    public static final double driveKa = 0.003;
+    public static final double driveKv = 0;//0.0135;
+    public static final double driveKa = 0;//0.003;
     public static final double driveKs = 0;
     public static final double strafeMult = 1.35;
     public static final PidCoefficients moveCoeffs = new PidCoefficients(0.07, 0, 0);

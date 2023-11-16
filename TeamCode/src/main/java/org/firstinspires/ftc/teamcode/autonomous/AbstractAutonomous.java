@@ -5,13 +5,12 @@ import org.firstinspires.ftc.teamcode.hardware.Robot;
 import org.firstinspires.ftc.teamcode.movement.Pose;
 import org.firstinspires.ftc.teamcode.vision.PropDetector;
 public abstract class AbstractAutonomous extends CommandOpMode {
-    public static final int minDetected = 10;
     public enum Case {
         LEFT, CENTER, RIGHT
     }
+    public static final int minDetected = 10;
     protected Robot robot;
     protected PropDetector detector;
-    protected Pose endPose;
     protected Side side;
     protected Case runCase = Case.CENTER;
     private Case detectCase = Case.CENTER;
@@ -38,11 +37,11 @@ public abstract class AbstractAutonomous extends CommandOpMode {
     }
     @Override
     public void startOpMode() {
-        //detector.close();
+        detector.close();
     }
     @Override
     public void endOpMode() {
         lastSide = side;
-        lastPose = endPose;
+        lastPose = robot.drive.pose();
     }
 }

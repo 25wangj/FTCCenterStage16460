@@ -14,46 +14,59 @@ import org.firstinspires.ftc.teamcode.control.AsymConstraints;
 import org.firstinspires.ftc.teamcode.hardware.ValueStorage.Side;
 import org.firstinspires.ftc.teamcode.movement.Pose;
 import org.firstinspires.ftc.teamcode.movement.TrajCommandBuilder;
+import org.firstinspires.ftc.teamcode.movement.Vec;
 import org.firstinspires.ftc.teamcode.vision.PropDetector;
-@Autonomous(name = "RedParkNear")
-public class RedParkNear extends AbstractAutonomous {
-    private AsymConstraints boardConstraints = new AsymConstraints(60, 80, 40);
-    private Pose start = new Pose(17, -62, -PI / 2);
-    private Pose dropLeft = new Pose(9, -34, 0);
-    private Pose dropCenter = new Pose(26, -28, -0.2);
-    private Pose dropRight = new Pose(31, -34, 0);
+@Autonomous(name = "RedParkFar")
+public class RedParkFar extends AbstractAutonomous {
+    private AsymConstraints boardConstraints = new AsymConstraints(10, 20, 20);
+    private Pose start = new Pose(-40, -62, -PI / 2);
+    private Pose dropLeft = new Pose(-43, -28, 1);
+    private Pose dropCenter = new Pose(-36, -16, 1);
+    private Pose dropRight = new Pose(-30, -28, -3.8);
+    private Pose mid1 = new Pose(-24, -10, 0);
+    private Pose mid2 = new Pose(12, -10, 0);
     private Pose board = new Pose(56, -36, 0);
-    private Pose park = new Pose(44, -60, 0);
+    private Pose park = new Pose(44, -12, 0);
     @Override
     public void initAutonomous() {
         side = Side.RED;
-        detector = new PropDetector(this, true, side);
+        detector = new PropDetector(this, false, side);
         robot.drive.setPose(start);
+        robot.drive.setMoveConstraints(new AsymConstraints(10, 20, 20));
+        robot.drive.setTurnConstraints(new AsymConstraints(1, 2, 2));
         Command traj1Left = new TrajCommandBuilder(robot.drive, start)
                 .lineTo(dropLeft)
                 .pause(0.5)
                 .marker(0, 0.25, FnCommand.once(t -> robot.intake.setRoller(rollerUp)))
-                .setMoveConstraints(boardConstraints)
-                .splineTo(board.vec(), 0)
-                .marker(FnCommand.once(t -> robot.stateMachine.transition(DEPOSIT, 240, armLeft)))
+                .setVf(10)
+                .splineTo(mid1.vec(), 0)
+                .setVf(10)
+                .lineTo(mid2.vec())
+                .marker(1, 0, FnCommand.once(t -> robot.stateMachine.transition(DEPOSIT, 240, armLeft)))
                 .build(scheduler);
         Command traj1Center = new TrajCommandBuilder(robot.drive, start)
                 .lineTo(dropCenter)
                 .pause(0.5)
                 .marker(0, 0.25, FnCommand.once(t -> robot.intake.setRoller(rollerUp)))
-                .setMoveConstraints(boardConstraints)
-                .splineTo(board.vec(), 0)
-                .marker(FnCommand.once(t -> robot.stateMachine.transition(DEPOSIT, 240, 0)))
+                .setVf(10)
+                .splineTo(mid1.vec(), 0)
+                .setVf(10)
+                .lineTo(mid2.vec())
+                .marker(1, 0, FnCommand.once(t -> robot.stateMachine.transition(DEPOSIT, 240, 0)))
                 .build(scheduler);
         Command traj1Right = new TrajCommandBuilder(robot.drive, start)
                 .lineTo(dropRight)
                 .pause(0.5)
                 .marker(0, 0.25, FnCommand.once(t -> robot.intake.setRoller(rollerUp)))
+                .setVf(10)
+                .splineTo(mid1.vec(), 0)
+                .setVf(10)
+                .lineTo(mid2.vec())
+                .marker(1, 0, FnCommand.once(t -> robot.stateMachine.transition(DEPOSIT, 240, armRight)))
+                .build(scheduler);
+        Command traj2 = new TrajCommandBuilder(robot.drive, mid2, new Vec(10, 0))
                 .setMoveConstraints(boardConstraints)
                 .splineTo(board.vec(), 0)
-                .marker(FnCommand.once(t -> robot.stateMachine.transition(DEPOSIT, 240, armRight)))
-                .build(scheduler);
-        Command traj2 = new TrajCommandBuilder(robot.drive, board)
                 .pause(1)
                 .marker(FnCommand.once(t -> robot.stateMachine.transition(RETRACT)))
                 .lineTo(park)

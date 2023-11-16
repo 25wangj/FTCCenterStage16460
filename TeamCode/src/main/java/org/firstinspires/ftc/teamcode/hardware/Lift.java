@@ -35,10 +35,10 @@ public class Lift implements Subsystem {
     private DcMotorEx liftR;
     private DcMotorEx liftL;
     private Servo claw;
-    private PidfController liftPidf;
-    private PidfController armPidf;
-    private MotionProfile liftProfile;
-    private MotionProfile armProfile;
+    private PidfController liftPidf = new PidfController(liftCoeffs, liftKf);
+    private PidfController armPidf = new PidfController(armCoeffs, armKf);
+    private MotionProfile liftProfile = new DelayProfile(0, 0, 0, 0);
+    private MotionProfile armProfile = new DelayProfile(0, 0, 0, 0);
     public Lift(LinearOpMode opMode, boolean auto) {
         liftR = opMode.hardwareMap.get(DcMotorEx.class, "liftR");
         liftL = opMode.hardwareMap.get(DcMotorEx.class, "liftL");
@@ -50,10 +50,6 @@ public class Lift implements Subsystem {
             liftR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             liftL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
-        liftPidf = new PidfController(liftCoeffs, liftKf);
-        armPidf = new PidfController(armCoeffs, armKf);
-        liftProfile = new DelayProfile(0, 0, 0, 0);
-        armProfile = new DelayProfile(0, 0, 0, 0);
     }
     public double restTime() {
         return max(liftProfile.tf(), armProfile.tf());

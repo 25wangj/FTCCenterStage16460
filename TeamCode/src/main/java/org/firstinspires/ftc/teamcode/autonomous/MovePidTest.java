@@ -13,13 +13,12 @@ import org.firstinspires.ftc.teamcode.movement.Pose;
 import org.firstinspires.ftc.teamcode.movement.TrajCommandBuilder;
 import org.firstinspires.ftc.teamcode.movement.Vec;
 @Config
-@Disabled
 @Autonomous(name = "MovePidTest")
 public class MovePidTest extends CommandOpMode {
     public static double dist = 96;
     public static double vm = 60;
     public static double ai = 80;
-    public static double af = 100;
+    public static double af = 80;
     private MecanumDrive drive;
     @Override
     public void initOpMode() {

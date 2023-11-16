@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.command;
 public class DeadlineCommand extends Command {
     private Command primary;
     private Command[] commands;
-    boolean[] dones;
+    private boolean[] dones;
     public DeadlineCommand(Command primary, Command... commands) {
         subsystems.addAll(primary.getSubsystems());
         cancelable = cancelable && primary.isCancelable();

@@ -19,7 +19,7 @@ public class TeleopTwoDriver extends CommandOpMode {
     @Override
     public void initOpMode() {
         robot = new Robot(this, false);
-        robot.drive.setHeading(lastPose.h + (lastSide == Side.RED ? PI / 2 : -PI / 2));
+        robot.drive.setHeading(lastPose.h + (lastSide == Side.BLUE ? PI / 2 : -PI / 2));
         scheduler.addListener(RisingEdgeDetector.listen(() -> gamepad1.ps, FnCommand.once(t -> robot.drive.setHeading(0))));
         scheduler.schedule(FnCommand.repeat(t -> {
             if (gamepad2.left_trigger > 0.1) {
@@ -85,7 +85,18 @@ public class TeleopTwoDriver extends CommandOpMode {
                     } else if (robot.stateMachine.state() == DEPOSIT || robot.stateMachine.state() == RETRACT) {
                         if (scheduler.schedule(robot.lift.goTo(liftPos, armPos, 0))) {
                             lastLiftPos = liftPos;
-                            lastArmPos = armPos;}}})));
+                            lastArmPos = armPos;}}})),
+                RisingEdgeDetector.listen(() -> gamepad1.right_bumper, FnCommand.once(t -> {
+                    if (robot.stateMachine.state() == INTAKE_OPEN) {
+                        robot.stateMachine.transition(LAUNCH);
+                    } else if (robot.stateMachine.state() == LAUNCH) {
+                        robot.stateMachine.transition(RELEASE);
+                    } else if (robot.stateMachine.state() == RELEASE) {
+                        robot.stateMachine.transition(CLIMB);}})),
+                RisingEdgeDetector.listen(() -> gamepad1.left_bumper, FnCommand.once(t -> {
+                    if (robot.stateMachine.state() == LAUNCH) {
+                        robot.stateMachine.transition(INTAKE_OPEN);
+                    }})));
     }
     private static double liftPos(boolean b, boolean x, boolean y) {
         if (b) {

@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.autonomous;
 import static java.lang.Math.*;
 import static org.firstinspires.ftc.teamcode.autonomous.AbstractAutonomous.Case.*;
 import static org.firstinspires.ftc.teamcode.hardware.RobotStateMachine.robotStates.*;
+import static org.firstinspires.ftc.teamcode.hardware.Intake.*;
 import static org.firstinspires.ftc.teamcode.hardware.Lift.*;
 import android.util.Pair;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -22,39 +23,38 @@ public class BlueParkNear extends AbstractAutonomous {
     private Pose dropCenter = new Pose(24, 26, 0.2);
     private Pose dropRight = new Pose(9, 34, 0);
     private Pose board = new Pose(56, 36, 0);
-    private Pose park = new Pose(46, 60, 0);
+    private Pose park = new Pose(44, 60, 0);
     @Override
     public void initAutonomous() {
         side = Side.BLUE;
-        endPose = park;
         detector = new PropDetector(this, false, side);
         robot.drive.setPose(start);
         Command traj1Left = new TrajCommandBuilder(robot.drive, start)
                 .lineTo(dropLeft)
                 .pause(0.5)
-                .marker(FnCommand.once(t -> robot.intake.setPower(-0.3)))
+                .marker(0, 0.25, FnCommand.once(t -> robot.intake.setRoller(rollerUp)))
                 .setMoveConstraints(boardConstraints)
-                .splineTo(board, 0)
+                .splineTo(board.vec(), 0)
                 .marker(FnCommand.once(t -> robot.stateMachine.transition(DEPOSIT, 240, armLeft)))
                 .build(scheduler);
         Command traj1Center = new TrajCommandBuilder(robot.drive, start)
                 .lineTo(dropCenter)
                 .pause(0.5)
-                .marker(FnCommand.once(t -> robot.intake.setPower(-0.3)))
+                .marker(0, 0.25, FnCommand.once(t -> robot.intake.setRoller(rollerUp)))
                 .setMoveConstraints(boardConstraints)
-                .splineTo(board, 0)
+                .splineTo(board.vec(), 0)
                 .marker(FnCommand.once(t -> robot.stateMachine.transition(DEPOSIT, 240, 0)))
                 .build(scheduler);
         Command traj1Right = new TrajCommandBuilder(robot.drive, start)
                 .lineTo(dropRight)
                 .pause(0.5)
-                .marker(FnCommand.once(t -> robot.intake.setPower(-0.3)))
+                .marker(0, 0.25, FnCommand.once(t -> robot.intake.setRoller(rollerUp)))
                 .setMoveConstraints(boardConstraints)
-                .splineTo(board, 0)
+                .splineTo(board.vec(), 0)
                 .marker(FnCommand.once(t -> robot.stateMachine.transition(DEPOSIT, 240, armRight)))
                 .build(scheduler);
         Command traj2 = new TrajCommandBuilder(robot.drive, board)
-                .pause(0.75)
+                .pause(1)
                 .marker(FnCommand.once(t -> robot.stateMachine.transition(RETRACT)))
                 .lineTo(park)
                 .marker(robot.lift.goBack())

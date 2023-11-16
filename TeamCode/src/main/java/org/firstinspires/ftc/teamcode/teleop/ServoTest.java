@@ -7,14 +7,13 @@ import org.firstinspires.ftc.teamcode.command.CommandOpMode;
 import org.firstinspires.ftc.teamcode.command.FnCommand;
 import org.firstinspires.ftc.teamcode.command.Subsystem;
 import org.firstinspires.ftc.teamcode.command.RisingEdgeDetector;
-@Disabled
 @TeleOp(name = "ServoTest")
 public class ServoTest extends CommandOpMode {
     private Servo servo;
     private double pos;
     @Override
     public void initOpMode() {
-        servo = hardwareMap.get(Servo.class, "claw");
+        servo = hardwareMap.get(Servo.class, "latch");
         pos = 0.5;
         Subsystem servoSubsystem = (t, b) -> {
             servo.setPosition(pos);

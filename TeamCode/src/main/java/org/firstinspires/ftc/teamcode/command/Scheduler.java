@@ -5,29 +5,26 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 public class Scheduler {
-    private HashSet<Command> commands;
-    private HashMap<Subsystem, Command> subsystems;
-    private Queue<Command> added;
-    private Queue<Command> canceled;
-    private ArrayList<Command> finished;
-    private HashSet<Listener> listeners;
+    private Set<Command> commands = new HashSet<>();
+    private Map<Subsystem, Command> subsystems = new HashMap<>();
+    private Set<Listener> listeners = new HashSet<>();
+    private Queue<Command> added = new ArrayDeque<>();
+    private Queue<Command> canceled = new ArrayDeque<>();
+    private List<Command> finished = new ArrayList<>();
     private ElapsedTime clock;
+    private double lastTime = 0;
     public Scheduler() {
         this(new ElapsedTime());
     }
     public Scheduler(ElapsedTime clock) {
-        commands = new HashSet<>();
-        subsystems = new HashMap<>();
-        added = new ArrayDeque<>();
-        canceled = new ArrayDeque<>();
-        finished = new ArrayList<>();
-        listeners = new HashSet<>();
         this.clock = clock;
     }
-    public void run(boolean active) {
+    public double run(boolean active) {
         double time = clock.seconds();
         for (Subsystem subsystem : subsystems.keySet()) {
             subsystem.update(time, active);
@@ -48,11 +45,11 @@ public class Scheduler {
             }
             for (int i = added.size(); i > 0; i--) {
                 Command command = added.poll();
-                command.init(time);
-                commands.add(command);
                 for (Subsystem subsystem : command.getSubsystems()) {
                     subsystems.put(subsystem, command);
                 }
+                commands.add(command);
+                command.init(time);
             }
             for (Command command : commands) {
                 if (command.done(time)) {
@@ -70,6 +67,7 @@ public class Scheduler {
             }
             finished.clear();
         }
+        return -lastTime + (lastTime = time);
     }
     public boolean schedule(Command command) {
         HashSet<Command> toCancel = new HashSet<>();

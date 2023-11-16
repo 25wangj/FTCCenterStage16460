@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode.movement;
-import static java.lang.Math.*;
 import org.firstinspires.ftc.teamcode.control.AsymConstraints;
 import org.firstinspires.ftc.teamcode.control.AsymProfile;
-import org.firstinspires.ftc.teamcode.control.DelayProfile;
 import org.firstinspires.ftc.teamcode.control.MotionProfile;
 public class PathTrajectory implements Trajectory {
     private Path path;
@@ -14,14 +12,23 @@ public class PathTrajectory implements Trajectory {
     public PathTrajectory(Path path, AsymConstraints moveConstraints, double vi, double vf, double hi) {
         this.path = path;
         len = path.length();
-        moveProfile = new AsymProfile(moveConstraints.scale(1 / len), 0, 0, vi / len, 1, vf / len);
+        moveProfile = new AsymProfile(moveConstraints.scaleX(1 / len), 0, 0, vi / len, 1, vf / len);
         this.hi = hi - path.state(0).vel.angle();
     }
     public PathTrajectory(Path path, AsymConstraints moveConstraints, AsymConstraints turnConstraints, double vi, double vf, double hi, double hf) {
         this.path = path;
         len = path.length();
-        moveProfile = new AsymProfile(moveConstraints.scale(1 / len), 0, 0, vi / len, 1, vf / len);
+        moveProfile = new AsymProfile(moveConstraints.scaleX(1 / len), 0, 0, vi / len, 1, vf / len);
         turnProfile = new AsymProfile(turnConstraints, 0, hi, 0, hf, 0);
+        if (turnProfile.tf() != 0) {
+            if (moveProfile.tf() > turnProfile.tf()) {
+                AsymConstraints turnConstraints2 = turnConstraints.scaleT(turnProfile.tf() / moveProfile.tf());
+                turnProfile = new AsymProfile(turnConstraints2, 0, hi, 0, hf, 0);
+            } else {
+                AsymConstraints moveConstraints2 = moveConstraints.scaleX(1 / len).scaleT(moveProfile.tf() / turnProfile.tf());
+                moveProfile = new AsymProfile(moveConstraints2, 0, 0, vi / len, 1, vf / len);
+            }
+        }
     }
     @Override
     public TrajectoryState state(double t) {
@@ -46,9 +53,6 @@ public class PathTrajectory implements Trajectory {
     }
     @Override
     public double tf() {
-        if (turnProfile == null) {
-            return ti + moveProfile.tf();
-        }
-        return ti + max(moveProfile.tf(), turnProfile.tf());
+        return ti + moveProfile.tf();
     }
 }

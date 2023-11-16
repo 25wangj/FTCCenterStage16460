@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.hardware;
 import static org.firstinspires.ftc.teamcode.hardware.Intake.*;
-import static org.firstinspires.ftc.teamcode.hardware.Lift.clawClosed;
-import static org.firstinspires.ftc.teamcode.hardware.Lift.clawOpen;
+import static org.firstinspires.ftc.teamcode.hardware.Lift.*;
+import static org.firstinspires.ftc.teamcode.hardware.Climb.*;
 import org.firstinspires.ftc.teamcode.command.CommandOpMode;
 import org.firstinspires.ftc.teamcode.command.FnCommand;
 import org.firstinspires.ftc.teamcode.command.ParCommand;
@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.command.Subsystem;
 import org.firstinspires.ftc.teamcode.command.WaitCommand;
 public class RobotStateMachine {
     public enum robotStates {
-        INTAKE_CLOSED, INTAKE_OPEN, EJECT_CLOSED, EJECT_OPEN, DEPOSIT, RETRACT
+        INTAKE_CLOSED, INTAKE_OPEN, EJECT_CLOSED, EJECT_OPEN, DEPOSIT, RETRACT, LAUNCH, RELEASE, CLIMB
     }
     public static StateMachine<robotStates> get(CommandOpMode opMode, Robot robot, robotStates state) {
         Subsystem[] subsystems = new Subsystem[] {robot.intake, robot.lift};
@@ -62,7 +62,17 @@ public class RobotStateMachine {
                 new ParCommand(robot.lift.goBack(), new WaitCommand(t -> {
                     robot.intake.setGate(gateOpen);
                     robot.intake.setRoller(rollerDown);}, 0.25, robot.intake)),
-                FnCommand.once(t -> robot.intake.setPower(intakeOpen), subsystems)));
+                FnCommand.once(t -> robot.intake.setPower(intakeOpen), subsystems)))
+                .addTransition(robotStates.INTAKE_OPEN, robotStates.LAUNCH, new WaitCommand(t -> {
+                    robot.climb.setPlane(planeRelease);
+                    robot.intake.setPower(0);}, 0.25, subsystems))
+                .addTransition(robotStates.LAUNCH, robotStates.INTAKE_OPEN, new WaitCommand(t -> {
+                    robot.climb.setPlane(planeHold);
+                    robot.intake.setPower(intakeOpen);}, 0.25, subsystems))
+                .addTransition(robotStates.LAUNCH, robotStates.RELEASE, new WaitCommand(
+                        t -> robot.climb.setLatch(latchOpen), 0.5, subsystems))
+                .addTransition(robotStates.RELEASE, robotStates.CLIMB, FnCommand.once(
+                        t -> robot.climb.climb(), subsystems));
         return builder.build(state);
     }
 }

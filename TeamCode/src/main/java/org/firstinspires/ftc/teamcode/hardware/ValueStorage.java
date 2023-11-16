@@ -4,6 +4,6 @@ public class ValueStorage {
     public enum Side {
         RED, BLUE
     }
-    public static Side lastSide = Side.RED;
+    public static Side lastSide = Side.BLUE;
     public static Pose lastPose = new Pose(0, 0, 0);
 }

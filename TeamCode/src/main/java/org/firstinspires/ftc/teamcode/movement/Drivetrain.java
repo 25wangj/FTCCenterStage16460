@@ -2,8 +2,8 @@ package org.firstinspires.ftc.teamcode.movement;
 import org.firstinspires.ftc.teamcode.command.Subsystem;
 import org.firstinspires.ftc.teamcode.control.AsymConstraints;
 public abstract class Drivetrain implements Subsystem {
-    protected AsymConstraints moveConstraints;
-    protected AsymConstraints turnConstraints;
+    private AsymConstraints moveConstraints;
+    private AsymConstraints turnConstraints;
     protected Trajectory traj;
     protected Localizer localizer;
     private boolean auto;
@@ -26,6 +26,18 @@ public abstract class Drivetrain implements Subsystem {
     }
     public void setTrajectory(Trajectory traj) {
         this.traj = traj;
+    }
+    public AsymConstraints getMoveConstraints() {
+        return moveConstraints;
+    }
+    public void setMoveConstraints(AsymConstraints c) {
+        moveConstraints = c;
+    }
+    public AsymConstraints getTurnConstraints() {
+        return turnConstraints;
+    }
+    public void setTurnConstraints(AsymConstraints c) {
+        turnConstraints = c;
     }
     public abstract void follow(double time);
     @Override

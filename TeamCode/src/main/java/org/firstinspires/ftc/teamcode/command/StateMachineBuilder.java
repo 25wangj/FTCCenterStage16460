@@ -3,15 +3,15 @@ import android.util.Pair;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 public class StateMachineBuilder<T extends Enum<T>> {
-    private HashSet<T> states;
-    private HashMap<Pair<T, T>, Function<double[], Command>> transitions;
+    private Set<T> states = new HashSet<>();
+    private Map<Pair<T, T>, Function<double[], Command>> transitions = new HashMap<>();
     private Scheduler scheduler;
     public StateMachineBuilder(CommandOpMode opMode) {
         scheduler = opMode.scheduler;
-        states = new HashSet<>();
-        transitions = new HashMap<>();
     }
     public StateMachineBuilder<T> addState(T... state) {
         states.addAll(Arrays.asList(state));

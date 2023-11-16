@@ -1,14 +1,14 @@
 package org.firstinspires.ftc.teamcode.command;
 import android.util.Pair;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 public class StateMachine<T extends Enum<T>> {
     private Scheduler scheduler;
     private T state;
-    private HashSet<T> states;
-    private HashMap<Pair<T, T>, Function<double[], Command>> transitions;
-    protected StateMachine(Scheduler scheduler, T state, HashSet<T> states, HashMap<Pair<T, T>, Function<double[], Command>> transitions) {
+    private Set<T> states;
+    private Map<Pair<T, T>, Function<double[], Command>> transitions;
+    protected StateMachine(Scheduler scheduler, T state, Set<T> states, Map<Pair<T, T>, Function<double[], Command>> transitions) {
         if (!states.contains(state)) {
             throw new IllegalArgumentException("State does not exist");
         }

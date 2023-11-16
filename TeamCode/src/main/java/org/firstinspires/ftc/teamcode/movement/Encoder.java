@@ -4,10 +4,9 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 public class Encoder {
     public enum Direction {FORWARDS, REVERSE}
     private DcMotorEx motor;
-    private Direction dir;
+    private Direction dir = Direction.FORWARDS;
     public Encoder(DcMotorEx motor) {
         this.motor = motor;
-        dir = Direction.FORWARDS;
     }
     public void setDirection(Direction direction) {
         dir = direction;

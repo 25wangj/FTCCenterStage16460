@@ -3,7 +3,9 @@ import org.firstinspires.ftc.teamcode.command.Command;
 import org.firstinspires.ftc.teamcode.command.Scheduler;
 import org.firstinspires.ftc.teamcode.control.AsymConstraints;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 public class TrajCommandBuilder {
     private Drivetrain drive;
@@ -13,25 +15,26 @@ public class TrajCommandBuilder {
     private double vf;
     private AsymConstraints moveConstraints;
     private AsymConstraints turnConstraints;
-    private ArrayList<Trajectory> trajs;
-    private ArrayList<Double> endTimes;
-    private ArrayList<ArrayList<Command>> markers;
-    private ArrayList<ArrayList<Double>> times;
-    private ArrayList<Command> globalMarkers;
-    private ArrayList<Double> globalTimes;
+    private List<Trajectory> trajs = new ArrayList<>();
+    private List<Double> endTimes = new ArrayList<>(Arrays.asList(0d));
+    private List<List<Command>> markers = new ArrayList<>();
+    private List<List<Double>> times = new ArrayList<>();
+    private List<Command> globalMarkers = new ArrayList<>();
+    private List<Double> globalTimes = new ArrayList<>();
     public TrajCommandBuilder(Drivetrain drive, Pose pos) {
         this.drive = drive;
         this.pos = pos;
         this.tangent = Vec.dir(pos.h);
-        this.moveConstraints = drive.moveConstraints;
-        this.turnConstraints = drive.turnConstraints;
-        trajs = new ArrayList<>();
-        endTimes = new ArrayList<>();
-        endTimes.add(0d);
-        markers = new ArrayList<>();
-        times = new ArrayList<>();
-        globalMarkers = new ArrayList<>();
-        globalTimes = new ArrayList<>();
+        moveConstraints = drive.getMoveConstraints();
+        turnConstraints = drive.getTurnConstraints();
+    }
+    public TrajCommandBuilder(Drivetrain drive, Pose pos, Vec vel) {
+        this.drive = drive;
+        this.pos = pos;
+        this.tangent = vel.normalize();
+        vi = vel.norm();
+        moveConstraints = drive.getMoveConstraints();
+        turnConstraints = drive.getTurnConstraints();
     }
     public TrajCommandBuilder setTangent(double h) {
         tangent = Vec.dir(h);
@@ -50,8 +53,8 @@ public class TrajCommandBuilder {
         return this;
     }
     public TrajCommandBuilder resetConstraints() {
-        moveConstraints = drive.moveConstraints;
-        turnConstraints = drive.turnConstraints;
+        moveConstraints = drive.getMoveConstraints();
+        turnConstraints = drive.getTurnConstraints();
         return this;
     }
     public TrajCommandBuilder pause(double t) {
@@ -125,8 +128,8 @@ public class TrajCommandBuilder {
             globalTimes.add(offset);
         } else {
             markers.get(markers.size() - 1).add(command);
-            times.get(markers.size() - 1).add((endTimes.get(endTimes.size() - 1) - endTimes.get(endTimes.size() - 2))
-                    * scale + offset);
+            times.get(markers.size() - 1).add(endTimes.get(endTimes.size() - 2) +
+                    (endTimes.get(endTimes.size() - 1) - endTimes.get(endTimes.size() - 2)) * scale + offset);
         }
         return this;
     }
@@ -157,10 +160,12 @@ public class TrajCommandBuilder {
             markers.get(0).add(globalMarkers.get(i));
             times.get(0).add(globalTimes.get(2 * i) * endTimes.get(endTimes.size() - 1) + globalTimes.get(2 * i + 1));
         }
+        System.out.println(endTimes);
         return new Command(drive) {
             private int index;
             private double ti;
-            private HashMap<Command, Double> currMarkers;
+            private Map<Command, Double> currMarkers;
+            private ArrayList<Command> removed = new ArrayList<>();
             @Override
             public void init(double time) {
                 index = 0;
@@ -174,23 +179,33 @@ public class TrajCommandBuilder {
             }
             @Override
             public void run(double time) {
-                if (index != trajs.size() - 1 && time > trajs.get(index).tf()) {
+                if (index != trajs.size() - 1 && time > ti + endTimes.get(index + 1)) {
                     index++;
-                    trajs.get(index).setTi(ti + endTimes.get(index));
+                    trajs.get(index).setTi(endTimes.get(index) + ti);
                     drive.setTrajectory(trajs.get(index));
                     for (int i = 0; i < markers.get(index).size(); i++) {
-                        currMarkers.put(markers.get(index).get(i), times.get(index).get(i) + endTimes.get(index) + ti);
+                        currMarkers.put(markers.get(index).get(i), times.get(index).get(i) + ti);
                     }
                 }
                 for (Map.Entry<Command, Double> p : currMarkers.entrySet()) {
                     if (time > p.getValue()) {
                         scheduler.schedule(p.getKey());
+                        removed.add(p.getKey());
                     }
-                    currMarkers.remove(p.getKey());
                 }
+                for (Command command : removed) {
+                    currMarkers.remove(command);
+                }
+                removed.clear();
             }
             @Override
-            public void end(double time, boolean canceled) {}
+            public void end(double time, boolean canceled) {
+                for (Map.Entry<Command, Double> p : currMarkers.entrySet()) {
+                    if (time > p.getValue()) {
+                        scheduler.schedule(p.getKey());
+                    }
+                }
+            }
             @Override
             public boolean done(double time) {
                 return time > ti + endTimes.get(endTimes.size() - 1);

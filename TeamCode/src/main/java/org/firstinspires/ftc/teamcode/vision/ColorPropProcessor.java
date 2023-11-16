@@ -10,10 +10,10 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 public class ColorPropProcessor implements VisionProcessor {
-    public static final Scalar redLower = new Scalar(0, 150, 0);
-    public static final Scalar redUpper = new Scalar(255, 255, 255);
     public static final Scalar blueLower = new Scalar(0, 0, 150);
     public static final Scalar blueUpper = new Scalar(255, 255, 255);
+    public static final Scalar redLower = new Scalar(0, 150, 0);
+    public static final Scalar redUpper = new Scalar(255, 255, 255);
     public static final double heightMin = 0.5;
     public static final double heightDiff = 0.5;
     public static final double threshold = 5;
@@ -26,12 +26,12 @@ public class ColorPropProcessor implements VisionProcessor {
     private Case detectCase = Case.CENTER;
     public ColorPropProcessor(boolean right, Side side) {
         this.right = right;
-        if (side == Side.RED) {
-            lower = redLower;
-            upper = redUpper;
-        } else {
+        if (side == Side.BLUE) {
             lower = blueLower;
             upper = blueUpper;
+        } else {
+            lower = redLower;
+            upper = redUpper;
         }
     }
     @Override
