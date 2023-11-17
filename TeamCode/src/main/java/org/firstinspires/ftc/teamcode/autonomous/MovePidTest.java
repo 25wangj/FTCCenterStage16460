@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.movement.Pose;
 import org.firstinspires.ftc.teamcode.movement.TrajCommandBuilder;
 import org.firstinspires.ftc.teamcode.movement.Vec;
 @Config
+@Disabled
 @Autonomous(name = "MovePidTest")
 public class MovePidTest extends CommandOpMode {
     public static double dist = 96;

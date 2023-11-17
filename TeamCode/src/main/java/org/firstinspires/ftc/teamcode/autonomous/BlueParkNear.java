@@ -20,7 +20,7 @@ public class BlueParkNear extends AbstractAutonomous {
     private AsymConstraints boardConstraints = new AsymConstraints(60, 80, 40);
     private Pose start = new Pose(17, 62, PI / 2);
     private Pose dropLeft = new Pose(31, 34, 0);
-    private Pose dropCenter = new Pose(24, 26, 0.2);
+    private Pose dropCenter = new Pose(24, 28, 0.2);
     private Pose dropRight = new Pose(9, 34, 0);
     private Pose board = new Pose(56, 36, 0);
     private Pose park = new Pose(44, 60, 0);

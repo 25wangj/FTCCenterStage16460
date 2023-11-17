@@ -18,7 +18,7 @@ import org.firstinspires.ftc.teamcode.movement.Vec;
 import org.firstinspires.ftc.teamcode.vision.PropDetector;
 @Autonomous(name = "RedParkFar")
 public class RedParkFar extends AbstractAutonomous {
-    private AsymConstraints boardConstraints = new AsymConstraints(10, 20, 20);
+    private AsymConstraints boardConstraints = new AsymConstraints(20, 30, 30);
     private Pose start = new Pose(-40, -62, -PI / 2);
     private Pose dropLeft = new Pose(-43, -28, 1);
     private Pose dropCenter = new Pose(-36, -16, 1);
@@ -32,15 +32,15 @@ public class RedParkFar extends AbstractAutonomous {
         side = Side.RED;
         detector = new PropDetector(this, false, side);
         robot.drive.setPose(start);
-        robot.drive.setMoveConstraints(new AsymConstraints(10, 20, 20));
-        robot.drive.setTurnConstraints(new AsymConstraints(1, 2, 2));
+        robot.drive.setMoveConstraints(new AsymConstraints(20, 30, 30));
+        robot.drive.setTurnConstraints(new AsymConstraints(1.5, 3, 3));
         Command traj1Left = new TrajCommandBuilder(robot.drive, start)
                 .lineTo(dropLeft)
                 .pause(0.5)
                 .marker(0, 0.25, FnCommand.once(t -> robot.intake.setRoller(rollerUp)))
-                .setVf(10)
+                .setVf(20)
                 .splineTo(mid1.vec(), 0)
-                .setVf(10)
+                .setVf(20)
                 .lineTo(mid2.vec())
                 .marker(1, 0, FnCommand.once(t -> robot.stateMachine.transition(DEPOSIT, 240, armLeft)))
                 .build(scheduler);
@@ -48,9 +48,9 @@ public class RedParkFar extends AbstractAutonomous {
                 .lineTo(dropCenter)
                 .pause(0.5)
                 .marker(0, 0.25, FnCommand.once(t -> robot.intake.setRoller(rollerUp)))
-                .setVf(10)
+                .setVf(20)
                 .splineTo(mid1.vec(), 0)
-                .setVf(10)
+                .setVf(20)
                 .lineTo(mid2.vec())
                 .marker(1, 0, FnCommand.once(t -> robot.stateMachine.transition(DEPOSIT, 240, 0)))
                 .build(scheduler);
@@ -58,13 +58,13 @@ public class RedParkFar extends AbstractAutonomous {
                 .lineTo(dropRight)
                 .pause(0.5)
                 .marker(0, 0.25, FnCommand.once(t -> robot.intake.setRoller(rollerUp)))
-                .setVf(10)
+                .setVf(20)
                 .splineTo(mid1.vec(), 0)
-                .setVf(10)
+                .setVf(20)
                 .lineTo(mid2.vec())
                 .marker(1, 0, FnCommand.once(t -> robot.stateMachine.transition(DEPOSIT, 240, armRight)))
                 .build(scheduler);
-        Command traj2 = new TrajCommandBuilder(robot.drive, mid2, new Vec(10, 0))
+        Command traj2 = new TrajCommandBuilder(robot.drive, mid2, new Vec(20, 0))
                 .setMoveConstraints(boardConstraints)
                 .splineTo(board.vec(), 0)
                 .pause(1)
