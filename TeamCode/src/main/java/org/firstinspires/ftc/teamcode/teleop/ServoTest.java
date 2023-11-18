@@ -13,7 +13,7 @@ public class ServoTest extends CommandOpMode {
     private double pos;
     @Override
     public void initOpMode() {
-        servo = hardwareMap.get(Servo.class, "latch");
+        servo = hardwareMap.get(Servo.class, "plane");
         pos = 0.5;
         Subsystem servoSubsystem = (t, b) -> {
             servo.setPosition(pos);

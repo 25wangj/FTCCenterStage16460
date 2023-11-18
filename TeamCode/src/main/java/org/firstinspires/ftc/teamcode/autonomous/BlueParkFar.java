@@ -23,10 +23,10 @@ public class BlueParkFar extends AbstractAutonomous {
     private Pose dropLeft = new Pose(-30, 28, 3.8);
     private Pose dropCenter = new Pose(-36, 16, -1);
     private Pose dropRight = new Pose(-43, 28, -1);
-    private Pose mid1 = new Pose(-24, -10, 0);
-    private Pose mid2 = new Pose(12, -10, 0);
-    private Pose board = new Pose(56, -36, 0);
-    private Pose park = new Pose(44, -12, 0);
+    private Pose mid1 = new Pose(-24, 10, 0);
+    private Pose mid2 = new Pose(12, 10, 0);
+    private Pose board = new Pose(56, 36, 0);
+    private Pose park = new Pose(44, 12, 0);
     @Override
     public void initAutonomous() {
         side = Side.BLUE;

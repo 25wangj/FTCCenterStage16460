@@ -69,8 +69,9 @@ public class RobotStateMachine {
                 .addTransition(robotStates.LAUNCH, robotStates.INTAKE_OPEN, new WaitCommand(t -> {
                     robot.climb.setPlane(planeHold);
                     robot.intake.setPower(intakeOpen);}, 0.25, subsystems))
-                .addTransition(robotStates.LAUNCH, robotStates.RELEASE, new WaitCommand(
-                        t -> robot.climb.setLatch(latchOpen), 0.5, subsystems))
+                .addTransition(robotStates.LAUNCH, robotStates.RELEASE, new SeqCommand(
+                        new WaitCommand(t -> robot.climb.setLatch(latchHalf), 0.5, subsystems),
+                        new WaitCommand(t -> robot.climb.setLatch(latchOpen), 0.25, subsystems)))
                 .addTransition(robotStates.RELEASE, robotStates.CLIMB, FnCommand.once(
                         t -> robot.climb.climb(), subsystems));
         return builder.build(state);

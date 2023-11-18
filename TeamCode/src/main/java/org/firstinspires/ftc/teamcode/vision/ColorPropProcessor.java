@@ -14,8 +14,8 @@ public class ColorPropProcessor implements VisionProcessor {
     public static final Scalar blueUpper = new Scalar(255, 255, 255);
     public static final Scalar redLower = new Scalar(0, 150, 0);
     public static final Scalar redUpper = new Scalar(255, 255, 255);
-    public static final double heightMin = 0.5;
-    public static final double heightDiff = 0.5;
+    public static final double heightMin = 0.1;
+    public static final double heightDiff = 0.4;
     public static final double threshold = 5;
     private Mat grayscale = new Mat();
     private int width;

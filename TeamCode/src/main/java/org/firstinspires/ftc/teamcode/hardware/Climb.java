@@ -6,10 +6,11 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.command.Subsystem;
 public class Climb implements Subsystem {
     public static final double latchClosed = 0.26;
+    public static final double latchHalf = 0.33;
     public static final double latchOpen = 0.4;
-    public static final double planeHold = 0;
-    public static final double planeRelease = 0;
-    public static final int climbUp = 1500;
+    public static final double planeHold = 0.35;
+    public static final double planeRelease = 0.45;
+    public static final int climbUp = 1000;
     private DcMotorEx climb;
     private Servo latch;
     private Servo plane;
