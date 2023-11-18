@@ -96,6 +96,10 @@ public class TeleopTwoDriver extends CommandOpMode {
                 RisingEdgeDetector.listen(() -> gamepad1.left_bumper, FnCommand.once(t -> {
                     if (robot.stateMachine.state() == LAUNCH) {
                         robot.stateMachine.transition(INTAKE_OPEN);
+                    }})),
+                RisingEdgeDetector.listen(() -> gamepad1.back, FnCommand.once(t -> {
+                    if (robot.stateMachine.state() == INTAKE_OPEN) {
+                        scheduler.schedule(robot.lift.reset());
                     }})));
     }
     private static double liftPos(boolean b, boolean x, boolean y) {

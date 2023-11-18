@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.hardware;
 import static java.lang.Math.*;
 import static com.qualcomm.robotcore.util.Range.*;
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -8,7 +10,9 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.command.Command;
 import org.firstinspires.ftc.teamcode.command.FnCommand;
+import org.firstinspires.ftc.teamcode.command.SeqCommand;
 import org.firstinspires.ftc.teamcode.command.Subsystem;
+import org.firstinspires.ftc.teamcode.command.WaitCommand;
 import org.firstinspires.ftc.teamcode.control.AsymConstraints;
 import org.firstinspires.ftc.teamcode.control.AsymProfile;
 import org.firstinspires.ftc.teamcode.control.DelayProfile;
@@ -32,6 +36,7 @@ public class Lift implements Subsystem {
     public static final AsymConstraints liftConstraints = new AsymConstraints(3500, 30000, 20000);
     public static final AsymConstraints armConstraints = new AsymConstraints(3000, 30000, 20000);
     public static final SymConstraints adjustConstraints = new SymConstraints(500, 10000);
+    private boolean resetting = false;
     private DcMotorEx liftR;
     private DcMotorEx liftL;
     private Servo claw;
@@ -81,13 +86,27 @@ public class Lift implements Subsystem {
     }
     @Override
     public void update(double time, boolean active) {
-        liftPidf.set(liftProfile.pos(time));
-        armPidf.set(armProfile.pos(time));
-        double leftX = liftL.getCurrentPosition();
-        double rightX = liftR.getCurrentPosition();
-        liftPidf.update(time, leftX + rightX, liftProfile.vel(time), liftProfile.accel(time));
-        armPidf.update(time,leftX - rightX, armProfile.vel(time), armProfile.accel(time));
-        liftL.setPower(liftPidf.get() + armPidf.get());
-        liftR.setPower(liftPidf.get() - armPidf.get());
+        if (!resetting) {
+            liftPidf.set(liftProfile.pos(time));
+            armPidf.set(armProfile.pos(time));
+            double leftX = liftL.getCurrentPosition();
+            double rightX = liftR.getCurrentPosition();
+            liftPidf.update(time, leftX + rightX, liftProfile.vel(time), liftProfile.accel(time));
+            armPidf.update(time, leftX - rightX, armProfile.vel(time), armProfile.accel(time));
+            liftL.setPower(liftPidf.get() + armPidf.get());
+            liftR.setPower(liftPidf.get() - armPidf.get());
+        }
+    }
+    public Command reset() {
+        return new SeqCommand(
+                new WaitCommand(t -> {
+                    resetting = true;
+                    liftL.setPower(-0.5);
+                    liftR.setPower(-0.5);
+                }, 0.25, this),
+                FnCommand.once(t -> {
+                    resetting = false;
+                    liftL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    liftR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);}, this));
     }
 }
