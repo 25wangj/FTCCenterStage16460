@@ -13,13 +13,15 @@ public class Robot {
     public final Lift lift;
     public final Climb climb;
     public StateMachine<RobotStateMachine.robotStates> stateMachine;
+    private LynxModule exhub;
     public Robot(CommandOpMode opMode, boolean auto) {
         for (LynxModule hub : opMode.hardwareMap.getAll(LynxModule.class)) {
             hub.setBulkCachingMode(AUTO);
         }
+        exhub = opMode.hardwareMap.get(LynxModule.class, "Expansion Hub 2");
         drive = new MecanumDrive(opMode, auto);
         intake = new Intake(opMode);
-        lift = new Lift(opMode, auto);
+        lift = new Lift(opMode, exhub, auto);
         climb = new Climb(opMode, auto);
         stateMachine = RobotStateMachine.get(opMode, this, INTAKE_OPEN);
         opMode.register(drive, intake, lift);

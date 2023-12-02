@@ -5,9 +5,9 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.command.Subsystem;
 public class Climb implements Subsystem {
-    public static final double latchClosed = 0.26;
-    public static final double latchHalf = 0.35;
-    public static final double latchOpen = 0.4;
+    public static final double latchClosed = 0.17;
+    public static final double latchHalf = 0.25;
+    public static final double latchOpen = 0.33;
     public static final double planeHold = 0.35;
     public static final double planeRelease = 0.45;
     public static final int climbUp = 1000;
@@ -29,6 +29,9 @@ public class Climb implements Subsystem {
         climb.setPower(1);
         climb.setTargetPosition(climbUp);
     }
+    public int get() {
+        return climb.getCurrentPosition();
+    }
     public void setLatch(double pos) {
         latch.setPosition(pos);
     }
@@ -36,5 +39,6 @@ public class Climb implements Subsystem {
         plane.setPosition(pos);
     }
     @Override
-    public void update(double time, boolean active) {}
+    public void update(double time, boolean active) {
+    }
 }

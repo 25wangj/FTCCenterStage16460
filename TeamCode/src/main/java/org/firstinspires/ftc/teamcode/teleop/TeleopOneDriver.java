@@ -56,6 +56,7 @@ public class TeleopOneDriver extends CommandOpMode {
             } else {
                 robot.drive.setPowers(p, turn);
             }
+            telemetry.addData("Climb", robot.climb.get());
         }, robot.drive));
         scheduler.addListener(
                 RisingEdgeDetector.listen(() -> gamepad1.right_bumper, FnCommand.once(t -> {

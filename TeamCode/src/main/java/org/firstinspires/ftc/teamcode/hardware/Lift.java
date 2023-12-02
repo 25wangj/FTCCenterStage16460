@@ -1,18 +1,16 @@
 package org.firstinspires.ftc.teamcode.hardware;
 import static java.lang.Math.*;
 import static com.qualcomm.robotcore.util.Range.*;
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
-
+import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.hardware.lynx.LynxNackException;
+import com.qualcomm.hardware.lynx.commands.core.LynxResetMotorEncoderCommand;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.command.Command;
 import org.firstinspires.ftc.teamcode.command.FnCommand;
-import org.firstinspires.ftc.teamcode.command.SeqCommand;
 import org.firstinspires.ftc.teamcode.command.Subsystem;
-import org.firstinspires.ftc.teamcode.command.WaitCommand;
 import org.firstinspires.ftc.teamcode.control.AsymConstraints;
 import org.firstinspires.ftc.teamcode.control.AsymProfile;
 import org.firstinspires.ftc.teamcode.control.DelayProfile;
@@ -36,24 +34,26 @@ public class Lift implements Subsystem {
     public static final AsymConstraints liftConstraints = new AsymConstraints(3500, 30000, 20000);
     public static final AsymConstraints armConstraints = new AsymConstraints(3000, 30000, 20000);
     public static final SymConstraints adjustConstraints = new SymConstraints(500, 10000);
-    private boolean resetting = false;
+    private boolean rest = true;
     private DcMotorEx liftR;
     private DcMotorEx liftL;
     private Servo claw;
+    private LynxModule hub;
     private PidfController liftPidf = new PidfController(liftCoeffs, liftKf);
     private PidfController armPidf = new PidfController(armCoeffs, armKf);
     private MotionProfile liftProfile = new DelayProfile(0, 0, 0, 0);
     private MotionProfile armProfile = new DelayProfile(0, 0, 0, 0);
-    public Lift(LinearOpMode opMode, boolean auto) {
+    public Lift(LinearOpMode opMode, LynxModule hub, boolean auto) {
         liftR = opMode.hardwareMap.get(DcMotorEx.class, "liftR");
         liftL = opMode.hardwareMap.get(DcMotorEx.class, "liftL");
         claw = opMode.hardwareMap.get(Servo.class, "claw");
+        this.hub = hub;
         liftR.setDirection(DcMotorSimple.Direction.REVERSE);
         if (auto) {
-            liftR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            liftL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            liftR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            liftL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            try {
+                new LynxResetMotorEncoderCommand(hub, liftR.getPortNumber()).send();
+                new LynxResetMotorEncoderCommand(hub, liftL.getPortNumber()).send();
+            } catch (InterruptedException | LynxNackException e) {}
         }
     }
     public double restTime() {
@@ -71,6 +71,13 @@ public class Lift implements Subsystem {
     }
     public Command goTo(double liftPos, double armPos, double delay) {
         return new FnCommand(t -> {
+            if (rest) {
+                rest = false;
+                try {
+                    new LynxResetMotorEncoderCommand(hub, liftR.getPortNumber()).send();
+                    new LynxResetMotorEncoderCommand(hub, liftL.getPortNumber()).send();
+                } catch (InterruptedException | LynxNackException e) {}
+            }
             liftProfile = AsymProfile.extendAsym(liftProfile, liftConstraints, t, liftPos, 0);
             armProfile = AsymProfile.extendAsym(armProfile, armConstraints, liftProfile.tf() + delay, armPos, 0);
         }, t -> {}, (t, b) -> {}, t -> t > restTime(), this);
@@ -79,14 +86,17 @@ public class Lift implements Subsystem {
         return new FnCommand(t -> {
             armProfile = AsymProfile.extendAsym(armProfile, armConstraints, t, 0, 0);
             liftProfile = AsymProfile.extendAsym(liftProfile, liftConstraints, armProfile.tf(), 0, 0);
-        }, t -> {}, (t, b) -> {}, t -> t > restTime(), this);
+        }, t -> {}, (t, b) -> rest = true, t -> t > restTime(), this);
     }
     public void setClaw(double pos) {
         claw.setPosition(pos);
     }
     @Override
     public void update(double time, boolean active) {
-        if (!resetting) {
+        if (rest) {
+            liftL.setPower(-0.2);
+            liftR.setPower(-0.2);
+        } else {
             liftPidf.set(liftProfile.pos(time));
             armPidf.set(armProfile.pos(time));
             double leftX = liftL.getCurrentPosition();
@@ -96,17 +106,5 @@ public class Lift implements Subsystem {
             liftL.setPower(liftPidf.get() + armPidf.get());
             liftR.setPower(liftPidf.get() - armPidf.get());
         }
-    }
-    public Command reset() {
-        return new SeqCommand(
-                new WaitCommand(t -> {
-                    resetting = true;
-                    liftL.setPower(-0.5);
-                    liftR.setPower(-0.5);
-                }, 0.25, this),
-                FnCommand.once(t -> {
-                    resetting = false;
-                    liftL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    liftR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);}, this));
     }
 }
