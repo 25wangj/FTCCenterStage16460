@@ -8,9 +8,6 @@ public class ThreeWheelLocalizer implements Localizer {
     private Encoder enc1;
     private Encoder enc2;
     private Encoder enc3;
-    private double last1 = Double.NaN;
-    private double last2 = Double.NaN;
-    private double last3 = Double.NaN;
     private double lastTime = Double.NaN;
     private double f;
     private SimpleMatrix invKin;
@@ -46,18 +43,22 @@ public class ThreeWheelLocalizer implements Localizer {
     }
     @Override
     public void update(double time) {
-        double p1 = f * enc1.getPosition();
-        double p2 = f * enc2.getPosition();
-        double p3 = f * enc3.getPosition();
-        if (p1 == last1 && p2 == last2 && p3 == last3) {
+        double v1 = f * enc1.getVelocity(time);
+        double v2 = f * enc2.getVelocity(time);
+        double v3 = f * enc3.getVelocity(time);
+        System.out.println("v1 " + v1);
+        System.out.println("v2 " + v2);
+        System.out.println("v3 " + v3);
+        if (v1 == 0 && v2 == 0 && v3 == 0) {
             vel = new Pose(0, 0, 0);
-        } else if (!Double.isNaN(last1)) {
-            SimpleMatrix local = invKin.mult(new SimpleMatrix(new double[][]{{p1 - last1}, {p2 - last2}, {p3 - last3}}));
+        } else if (!Double.isNaN(lastTime)) {
+            double dt = time - lastTime;
+            SimpleMatrix local = invKin.mult(new SimpleMatrix(new double[][]{{v1 * dt}, {v2 * dt}, {v3 * dt}}));
             rot.set(0, 0, cos(pos.h));
             rot.set(0, 1, -sin(pos.h));
             rot.set(1, 0, sin(pos.h));
             rot.set(1, 1, cos(pos.h));
-            double dA = local.get(1, 0);
+            double dA = local.get(2, 0);
             if (abs(dA) < EPS) {
                 integ.set(0, 0, 1 - dA * dA / 6);
                 integ.set(0, 1, -dA / 2);
@@ -70,13 +71,10 @@ public class ThreeWheelLocalizer implements Localizer {
                 integ.set(1, 1, sin(dA) / dA);
             }
             SimpleMatrix dPos = rot.mult(integ.mult(local));
-            SimpleMatrix nVel = rot.mult(local).scale(1 / (time - lastTime));
+            SimpleMatrix nVel = rot.mult(local).scale(1 / dt);
             pos = new Pose(pos.x + dPos.get(0, 0), pos.y + dPos.get(1, 0), pos.h + dPos.get(2, 0));
             vel = new Pose(nVel.get(0, 0), nVel.get(1, 0), nVel.get(2, 0));
         }
-        last1 = p1;
-        last2 = p2;
-        last3 = p3;
         lastTime = time;
     }
 }

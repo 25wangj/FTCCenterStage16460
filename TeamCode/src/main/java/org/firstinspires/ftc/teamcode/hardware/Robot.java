@@ -1,5 +1,4 @@
 package org.firstinspires.ftc.teamcode.hardware;
-import static com.qualcomm.hardware.lynx.LynxModule.BulkCachingMode.AUTO;
 import static org.firstinspires.ftc.teamcode.hardware.RobotStateMachine.robotStates.*;
 import static org.firstinspires.ftc.teamcode.hardware.Intake.*;
 import static org.firstinspires.ftc.teamcode.hardware.Lift.*;
@@ -15,16 +14,13 @@ public class Robot {
     public StateMachine<RobotStateMachine.robotStates> stateMachine;
     private LynxModule exhub;
     public Robot(CommandOpMode opMode, boolean auto) {
-        for (LynxModule hub : opMode.hardwareMap.getAll(LynxModule.class)) {
-            hub.setBulkCachingMode(AUTO);
-        }
         exhub = opMode.hardwareMap.get(LynxModule.class, "Expansion Hub 2");
         drive = new MecanumDrive(opMode, auto);
         intake = new Intake(opMode);
         lift = new Lift(opMode, exhub, auto);
         climb = new Climb(opMode, auto);
         stateMachine = RobotStateMachine.get(opMode, this, INTAKE_OPEN);
-        opMode.register(drive, intake, lift);
+        opMode.register(drive, intake, lift, climb);
         if (!auto) {
             intake.setPower(intakeOpen);
         }

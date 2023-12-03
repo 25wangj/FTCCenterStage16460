@@ -4,6 +4,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 public class Encoder {
     public enum Direction {FORWARDS, REVERSE}
     private DcMotorEx motor;
+    private double lastTime = Double.NaN;
+    int lastPos = 0;
     private Direction dir = Direction.FORWARDS;
     public Encoder(DcMotorEx motor) {
         this.motor = motor;
@@ -19,5 +21,18 @@ public class Encoder {
     }
     public int getPosition() {
         return mult() * motor.getCurrentPosition();
+    }
+    public int getVelocity(double time) {
+        if (!Double.isNaN(lastTime)) {
+            int vel = (int)motor.getVelocity() & 0xffff;
+            double estVel = (lastPos - (lastPos = motor.getCurrentPosition())) / (lastTime - (lastTime = time));
+            System.out.println("Estimated " + estVel);
+            vel += ((vel % 20) / 4) * 0x10000;
+            vel += Math.round((estVel - vel) / (5 * 0x10000)) * 5 * 0x10000;
+            return mult() * vel;
+        }
+        lastPos = motor.getCurrentPosition();
+        lastTime = time;
+        return mult() * (int)motor.getVelocity();
     }
 }

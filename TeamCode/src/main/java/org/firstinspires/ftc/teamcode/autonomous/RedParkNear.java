@@ -14,15 +14,16 @@ import org.firstinspires.ftc.teamcode.control.AsymConstraints;
 import org.firstinspires.ftc.teamcode.hardware.ValueStorage.Side;
 import org.firstinspires.ftc.teamcode.movement.Pose;
 import org.firstinspires.ftc.teamcode.movement.TrajCommandBuilder;
+import org.firstinspires.ftc.teamcode.movement.Vec;
 import org.firstinspires.ftc.teamcode.vision.PropDetector;
 @Autonomous(name = "RedParkNear")
 public class RedParkNear extends AbstractAutonomous {
     private AsymConstraints boardConstraints = new AsymConstraints(60, 80, 40);
-    private Pose start = new Pose(17, -62, -PI / 2);
+    private Pose start = new Pose(16, -62, -PI / 2);
     private Pose dropLeft = new Pose(9, -34, 0);
-    private Pose dropCenter = new Pose(26, -28, -0.2);
-    private Pose dropRight = new Pose(31, -34, 0);
-    private Pose board = new Pose(56, -36, 0);
+    private Pose dropCenter = new Pose(24, -28, -0.2);
+    private Pose dropRight = new Pose(30, -34, 0);
+    private Pose board = new Pose(54, -36, 0);
     private Pose park = new Pose(44, -60, 0);
     @Override
     public void initAutonomous() {
@@ -56,8 +57,10 @@ public class RedParkNear extends AbstractAutonomous {
         Command traj2 = new TrajCommandBuilder(robot.drive, board)
                 .pause(1)
                 .marker(FnCommand.once(t -> robot.stateMachine.transition(RETRACT)))
-                .lineTo(park)
+                .setVf(45)
+                .splineTo(new Pose(44, -46, 0), -PI / 2)
                 .marker(robot.lift.goBack())
+                .lineTo(park)
                 .build(scheduler);
         scheduler.schedule(new SeqCommand(new SwitchCommand<>(() -> runCase,
                 new Pair<>(LEFT, traj1Left), new Pair<>(CENTER, traj1Center), new Pair<>(RIGHT, traj1Right)),

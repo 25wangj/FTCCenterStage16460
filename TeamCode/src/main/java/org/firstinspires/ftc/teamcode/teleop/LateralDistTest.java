@@ -9,7 +9,6 @@ import org.firstinspires.ftc.teamcode.hardware.MecanumDrive;
 import org.firstinspires.ftc.teamcode.movement.Pose;
 import org.firstinspires.ftc.teamcode.movement.Vec;
 @Config
-@Disabled
 @TeleOp(name = "LateralDistTest")
 public class LateralDistTest extends CommandOpMode {
     public static int turns = 10;

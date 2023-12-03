@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.command;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 public abstract class CommandOpMode extends LinearOpMode {
     protected Scheduler scheduler;
@@ -13,6 +14,9 @@ public abstract class CommandOpMode extends LinearOpMode {
     public void runOpMode() {
         scheduler = new Scheduler();
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        for (LynxModule module : hardwareMap.getAll(LynxModule.class)) {
+            module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
+        }
         initOpMode();
         while (!isStarted() && !isStopRequested()) {
             waitOpMode();

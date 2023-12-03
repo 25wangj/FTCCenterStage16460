@@ -7,7 +7,6 @@ import org.firstinspires.ftc.teamcode.command.FnCommand;
 import org.firstinspires.ftc.teamcode.hardware.MecanumDrive;
 import org.firstinspires.ftc.teamcode.movement.Pose;
 import org.firstinspires.ftc.teamcode.movement.Vec;
-@Disabled
 @TeleOp(name = "LocalizationTest")
 public class LocalizationTest extends CommandOpMode {
     private MecanumDrive drive;
