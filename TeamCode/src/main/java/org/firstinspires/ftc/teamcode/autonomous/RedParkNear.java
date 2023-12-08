@@ -14,7 +14,6 @@ import org.firstinspires.ftc.teamcode.control.AsymConstraints;
 import org.firstinspires.ftc.teamcode.hardware.ValueStorage.Side;
 import org.firstinspires.ftc.teamcode.movement.Pose;
 import org.firstinspires.ftc.teamcode.movement.TrajCommandBuilder;
-import org.firstinspires.ftc.teamcode.movement.Vec;
 import org.firstinspires.ftc.teamcode.vision.PropDetector;
 @Autonomous(name = "RedParkNear")
 public class RedParkNear extends AbstractAutonomous {
@@ -23,7 +22,7 @@ public class RedParkNear extends AbstractAutonomous {
     private Pose dropLeft = new Pose(9, -34, 0);
     private Pose dropCenter = new Pose(24, -28, -0.2);
     private Pose dropRight = new Pose(30, -34, 0);
-    private Pose board = new Pose(54, -36, 0);
+    private Pose board = new Pose(55, -36, 0);
     private Pose park = new Pose(44, -60, 0);
     @Override
     public void initAutonomous() {
@@ -58,7 +57,7 @@ public class RedParkNear extends AbstractAutonomous {
                 .pause(1)
                 .marker(FnCommand.once(t -> robot.stateMachine.transition(RETRACT)))
                 .setVf(45)
-                .splineTo(new Pose(44, -46, 0), -PI / 2)
+                .splineTo(new Pose(44, -47, 0), -PI / 2)
                 .marker(robot.lift.goBack())
                 .lineTo(park)
                 .build(scheduler);

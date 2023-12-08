@@ -26,7 +26,6 @@ public class Encoder {
         if (!Double.isNaN(lastTime)) {
             int vel = (int)motor.getVelocity() & 0xffff;
             double estVel = (lastPos - (lastPos = motor.getCurrentPosition())) / (lastTime - (lastTime = time));
-            System.out.println("Estimated " + estVel);
             vel += ((vel % 20) / 4) * 0x10000;
             vel += Math.round((estVel - vel) / (5 * 0x10000)) * 5 * 0x10000;
             return mult() * vel;

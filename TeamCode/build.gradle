@@ -31,4 +31,5 @@ dependencies {
     implementation project(':FtcRobotController')
     annotationProcessor files('lib/OpModeAnnotationProcessor.jar')
     implementation 'org.ejml:ejml-all:0.43'
+    implementation 'com.github.felHR85:UsbSerial:6.1.0'
 }

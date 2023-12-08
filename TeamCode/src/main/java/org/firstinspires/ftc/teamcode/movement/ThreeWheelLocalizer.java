@@ -46,9 +46,6 @@ public class ThreeWheelLocalizer implements Localizer {
         double v1 = f * enc1.getVelocity(time);
         double v2 = f * enc2.getVelocity(time);
         double v3 = f * enc3.getVelocity(time);
-        System.out.println("v1 " + v1);
-        System.out.println("v2 " + v2);
-        System.out.println("v3 " + v3);
         if (v1 == 0 && v2 == 0 && v3 == 0) {
             vel = new Pose(0, 0, 0);
         } else if (!Double.isNaN(lastTime)) {

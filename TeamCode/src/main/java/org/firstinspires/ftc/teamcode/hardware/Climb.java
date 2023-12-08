@@ -14,7 +14,7 @@ public class Climb implements Subsystem {
     public static final double planeHold = 0.35;
     public static final double planeRelease = 0.45;
     public static final int climbOut = -2500;
-    public static final int climbUp = 1500;
+    public static final int climbUp = -1500;
     private DcMotorEx climb;
     private Servo latch;
     private Servo plane;
