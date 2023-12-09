@@ -8,8 +8,8 @@ import org.firstinspires.ftc.teamcode.command.SeqCommand;
 import org.firstinspires.ftc.teamcode.command.Subsystem;
 import org.firstinspires.ftc.teamcode.command.WaitCommand;
 public class Intake implements Subsystem {
-    public static final double rollerUp = 0.45;
-    public static final double rollerDown = 0.56;
+    public static final double rollerUp = 0.44;
+    public static final double rollerDown = 0.54;
     public static final double gateClosed = 0.8;
     public static final double gateOpen = 0.5;
     public static final double gatePush = 0.58;
