@@ -7,6 +7,7 @@ import org.firstinspires.ftc.teamcode.command.CommandOpMode;
 import org.firstinspires.ftc.teamcode.command.FnCommand;
 import org.firstinspires.ftc.teamcode.command.Subsystem;
 import org.firstinspires.ftc.teamcode.command.RisingEdgeDetector;
+@Disabled
 @TeleOp(name = "ServoTest")
 public class ServoTest extends CommandOpMode {
     private Servo servo;

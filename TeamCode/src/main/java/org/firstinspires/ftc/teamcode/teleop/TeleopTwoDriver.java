@@ -40,6 +40,9 @@ public class TeleopTwoDriver extends CommandOpMode {
             } else if (robot.stateMachine.state() == EJECT_CLOSED) {
                 robot.stateMachine.transition(INTAKE_CLOSED);
             }
+            if (gamepad1.dpad_up) {
+                robot.climb.up();
+            }
             if (gamepad2.dpad_up || gamepad2.dpad_down || gamepad2.dpad_left || gamepad2.dpad_right) {
                 if (gamepad2.dpad_up && robot.stateMachine.state() == INTAKE_OPEN) {
                     scheduler.schedule(robot.intake.twiddle());

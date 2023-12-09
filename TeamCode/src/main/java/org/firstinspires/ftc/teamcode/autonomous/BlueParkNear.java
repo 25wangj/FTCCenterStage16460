@@ -14,6 +14,7 @@ import org.firstinspires.ftc.teamcode.control.AsymConstraints;
 import org.firstinspires.ftc.teamcode.hardware.ValueStorage.Side;
 import org.firstinspires.ftc.teamcode.movement.Pose;
 import org.firstinspires.ftc.teamcode.movement.TrajCommandBuilder;
+import org.firstinspires.ftc.teamcode.movement.Vec;
 import org.firstinspires.ftc.teamcode.vision.PropDetector;
 @Autonomous(name = "BlueParkNear")
 public class BlueParkNear extends AbstractAutonomous {
@@ -56,9 +57,8 @@ public class BlueParkNear extends AbstractAutonomous {
         Command traj2 = new TrajCommandBuilder(robot.drive, board)
                 .pause(1)
                 .marker(FnCommand.once(t -> robot.stateMachine.transition(RETRACT)))
-                .setVf(45)
-                .splineTo(new Pose(44, 47, 0), PI / 2)
-                .marker(robot.lift.goBack())
+                .lineTo(new Vec(44, 36))
+                .marker(0, 0.5, robot.lift.goBack())
                 .lineTo(park)
                 .build(scheduler);
         scheduler.schedule(new SeqCommand(new SwitchCommand<>(() -> runCase,

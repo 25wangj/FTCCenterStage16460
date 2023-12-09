@@ -25,7 +25,7 @@ public class BlueParkFar extends AbstractAutonomous {
     private Pose dropRight = new Pose(-43, 28, -1);
     private Pose mid1 = new Pose(-24, 10, 0);
     private Pose mid2 = new Pose(12, 10, 0);
-    private Pose board = new Pose(56, 36, 0);
+    private Pose board = new Pose(52, 36, 0);
     private Pose park = new Pose(44, 12, 0);
     @Override
     public void initAutonomous() {
@@ -40,9 +40,6 @@ public class BlueParkFar extends AbstractAutonomous {
                 .marker(0, 0.25, FnCommand.once(t -> robot.intake.setRoller(rollerUp)))
                 .setVf(20)
                 .splineTo(mid1.vec(), 0)
-                .setVf(20)
-                .lineTo(mid2.vec())
-                .marker(1, 0, FnCommand.once(t -> robot.stateMachine.transition(DEPOSIT, 240, armLeft)))
                 .build(scheduler);
         Command traj1Center = new TrajCommandBuilder(robot.drive, start)
                 .lineTo(dropCenter)
@@ -50,9 +47,6 @@ public class BlueParkFar extends AbstractAutonomous {
                 .marker(0, 0.25, FnCommand.once(t -> robot.intake.setRoller(rollerUp)))
                 .setVf(20)
                 .splineTo(mid1.vec(), 0)
-                .setVf(20)
-                .lineTo(mid2.vec())
-                .marker(1, 0, FnCommand.once(t -> robot.stateMachine.transition(DEPOSIT, 240, 0)))
                 .build(scheduler);
         Command traj1Right = new TrajCommandBuilder(robot.drive, start)
                 .lineTo(dropRight)
@@ -60,13 +54,13 @@ public class BlueParkFar extends AbstractAutonomous {
                 .marker(0, 0.25, FnCommand.once(t -> robot.intake.setRoller(rollerUp)))
                 .setVf(20)
                 .splineTo(mid1.vec(), 0)
-                .setVf(20)
-                .lineTo(mid2.vec())
-                .marker(1, 0, FnCommand.once(t -> robot.stateMachine.transition(DEPOSIT, 240, armRight)))
                 .build(scheduler);
-        Command traj2 = new TrajCommandBuilder(robot.drive, mid2, new Vec(20, 0))
+        Command traj2 = new TrajCommandBuilder(robot.drive, mid1, new Vec(20, 0))
+                .lineTo(mid2.vec())
+                .pause(15)
                 .setMoveConstraints(boardConstraints)
-                .splineTo(board.vec(), 0)
+                .splineTo(board, 0.3)
+                .marker(FnCommand.once(t -> robot.stateMachine.transition(DEPOSIT, 700, 0)))
                 .pause(1)
                 .marker(FnCommand.once(t -> robot.stateMachine.transition(RETRACT)))
                 .lineTo(park)
