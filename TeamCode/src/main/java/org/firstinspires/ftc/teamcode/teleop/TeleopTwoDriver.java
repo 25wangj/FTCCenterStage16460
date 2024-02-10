@@ -5,12 +5,14 @@ import static org.firstinspires.ftc.teamcode.hardware.ValueStorage.*;
 import static org.firstinspires.ftc.teamcode.hardware.Intake.*;
 import static org.firstinspires.ftc.teamcode.hardware.Lift.*;
 import static org.firstinspires.ftc.teamcode.hardware.RobotStateMachine.robotStates.*;
+import com.outoftheboxrobotics.photoncore.Photon;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.command.CommandOpMode;
 import org.firstinspires.ftc.teamcode.command.FnCommand;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
 import org.firstinspires.ftc.teamcode.movement.Vec;
 import org.firstinspires.ftc.teamcode.command.RisingEdgeDetector;
+@Photon
 @TeleOp(name = "TwoDriver")
 public class TeleopTwoDriver extends CommandOpMode {
     private Robot robot;
@@ -40,9 +42,6 @@ public class TeleopTwoDriver extends CommandOpMode {
             } else if (robot.stateMachine.state() == EJECT_CLOSED) {
                 robot.stateMachine.transition(INTAKE_CLOSED);
             }
-            if (gamepad1.dpad_up) {
-                robot.climb.up();
-            }
             if (gamepad2.dpad_up || gamepad2.dpad_down || gamepad2.dpad_left || gamepad2.dpad_right) {
                 if (gamepad2.dpad_up && robot.stateMachine.state() == INTAKE_OPEN) {
                     scheduler.schedule(robot.intake.twiddle());
@@ -67,7 +66,7 @@ public class TeleopTwoDriver extends CommandOpMode {
                     } else if (robot.stateMachine.state() == INTAKE_OPEN) {
                         robot.stateMachine.transition(DEPOSIT, lastLiftPos, lastArmPos);
                     } else if (robot.stateMachine.state() == DEPOSIT) {
-                        robot.stateMachine.transition(RETRACT);
+                        robot.stateMachine.transition(RETRACT, 0);
                     } else if (robot.stateMachine.state() == RETRACT) {
                         robot.stateMachine.transition(INTAKE_OPEN);
                     }})),

@@ -13,7 +13,7 @@ public class Climb implements Subsystem {
     public static final double latchOpen = 0.33;
     public static final double planeHold = 0.35;
     public static final double planeRelease = 0.45;
-    public static int climbOut = -2500;
+    public static int climbOut = -2550;
     public static final int climbUp = -1500;
     private DcMotorEx climb;
     private Servo latch;
@@ -50,10 +50,6 @@ public class Climb implements Subsystem {
     }
     public int get() {
         return climb.getCurrentPosition();
-    }
-    public void up() {
-        climbOut -= 5;
-        climb.setTargetPosition(climbOut);
     }
     @Override
     public void update(double time, boolean active) {

@@ -5,6 +5,8 @@ import static org.firstinspires.ftc.teamcode.hardware.RobotStateMachine.robotSta
 import static org.firstinspires.ftc.teamcode.hardware.Intake.*;
 import static org.firstinspires.ftc.teamcode.hardware.Lift.*;
 import android.util.Pair;
+
+import com.outoftheboxrobotics.photoncore.Photon;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import org.firstinspires.ftc.teamcode.command.Command;
 import org.firstinspires.ftc.teamcode.command.FnCommand;
@@ -16,13 +18,14 @@ import org.firstinspires.ftc.teamcode.movement.Pose;
 import org.firstinspires.ftc.teamcode.movement.TrajCommandBuilder;
 import org.firstinspires.ftc.teamcode.movement.Vec;
 import org.firstinspires.ftc.teamcode.vision.PropDetector;
+@Photon
 @Autonomous(name = "RedParkNear")
 public class RedParkNear extends AbstractAutonomous {
     private AsymConstraints boardConstraints = new AsymConstraints(60, 80, 40);
-    private Pose start = new Pose(16, -62, -PI / 2);
-    private Pose dropLeft = new Pose(9, -34, 0);
-    private Pose dropCenter = new Pose(24, -28, -0.2);
-    private Pose dropRight = new Pose(30, -34, 0);
+    private Pose start = new Pose(17, -62, PI / 2);
+    private Pose dropLeft = new Pose(9, -36, 0);
+    private Pose dropCenter = new Pose(24, -26, -0.2);
+    private Pose dropRight = new Pose(30, -36, 0);
     private Pose board = new Pose(55, -36, 0);
     private Pose park = new Pose(44, -60, 0);
     @Override
@@ -32,34 +35,35 @@ public class RedParkNear extends AbstractAutonomous {
         robot.drive.setPose(start);
         Command traj1Left = new TrajCommandBuilder(robot.drive, start)
                 .lineTo(dropLeft)
-                .pause(0.5)
-                .marker(0, 0.25, FnCommand.once(t -> robot.intake.setRoller(rollerUp)))
+                .pause(0.25)
+                .marker(0, 0, FnCommand.once(t -> robot.intake.setRoller(rollerUp)))
                 .setMoveConstraints(boardConstraints)
                 .splineTo(board.vec(), 0)
                 .marker(FnCommand.once(t -> robot.stateMachine.transition(DEPOSIT, 240, armLeft)))
                 .build(scheduler);
         Command traj1Center = new TrajCommandBuilder(robot.drive, start)
                 .lineTo(dropCenter)
-                .pause(0.5)
-                .marker(0, 0.25, FnCommand.once(t -> robot.intake.setRoller(rollerUp)))
+                .pause(0.25)
+                .marker(0, 0, FnCommand.once(t -> robot.intake.setRoller(rollerUp)))
                 .setMoveConstraints(boardConstraints)
                 .splineTo(board.vec(), 0)
                 .marker(FnCommand.once(t -> robot.stateMachine.transition(DEPOSIT, 240, 0)))
                 .build(scheduler);
         Command traj1Right = new TrajCommandBuilder(robot.drive, start)
                 .lineTo(dropRight)
-                .pause(0.5)
-                .marker(0, 0.25, FnCommand.once(t -> robot.intake.setRoller(rollerUp)))
+                .pause(0.25)
+                .marker(0, 0, FnCommand.once(t -> robot.intake.setRoller(rollerUp)))
                 .setMoveConstraints(boardConstraints)
                 .splineTo(board.vec(), 0)
                 .marker(FnCommand.once(t -> robot.stateMachine.transition(DEPOSIT, 240, armRight)))
                 .build(scheduler);
         Command traj2 = new TrajCommandBuilder(robot.drive, board)
-                .pause(1)
-                .marker(FnCommand.once(t -> robot.stateMachine.transition(RETRACT)))
-                .lineTo(new Vec(44, -36))
-                .marker(0, 0.5, robot.lift.goBack())
-                .lineTo(park)
+                .pause(0.5)
+                .marker(0, 0, FnCommand.once(t -> robot.stateMachine.transition(RETRACT, 1)))
+                .setTangent(PI)
+                .splineTo(park, -PI / 2)
+                .marker(0, 0.5, FnCommand.once(t -> robot.stateMachine.transition(IDLE)))
+                .pause(0.5)
                 .build(scheduler);
         scheduler.schedule(new SeqCommand(new SwitchCommand<>(() -> runCase,
                 new Pair<>(LEFT, traj1Left), new Pair<>(CENTER, traj1Center), new Pair<>(RIGHT, traj1Right)),

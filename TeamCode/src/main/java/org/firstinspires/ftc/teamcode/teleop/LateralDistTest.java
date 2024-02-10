@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.teleop;
 import static java.lang.Math.*;
 import com.acmerobotics.dashboard.config.Config;
+import com.outoftheboxrobotics.photoncore.Photon;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.command.CommandOpMode;
@@ -9,6 +10,8 @@ import org.firstinspires.ftc.teamcode.hardware.MecanumDrive;
 import org.firstinspires.ftc.teamcode.movement.Pose;
 import org.firstinspires.ftc.teamcode.movement.Vec;
 @Config
+@Photon
+@Disabled
 @TeleOp(name = "LateralDistTest")
 public class LateralDistTest extends CommandOpMode {
     public static int turns = 10;

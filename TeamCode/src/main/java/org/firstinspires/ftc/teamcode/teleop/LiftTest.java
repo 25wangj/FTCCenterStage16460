@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.teleop;
 import static java.lang.Math.*;
 import static com.qualcomm.robotcore.util.Range.*;
 import com.acmerobotics.dashboard.config.Config;
+import com.outoftheboxrobotics.photoncore.Photon;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -21,6 +22,7 @@ import org.firstinspires.ftc.teamcode.control.SymProfile;
 import org.firstinspires.ftc.teamcode.command.RisingEdgeDetector;
 @Config
 @Disabled
+@Photon
 @TeleOp(name = "LiftTest")
 public class LiftTest extends CommandOpMode {
     public static final double liftLow = 160;

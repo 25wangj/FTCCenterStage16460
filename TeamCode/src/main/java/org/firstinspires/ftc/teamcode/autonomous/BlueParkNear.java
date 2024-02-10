@@ -5,6 +5,8 @@ import static org.firstinspires.ftc.teamcode.hardware.RobotStateMachine.robotSta
 import static org.firstinspires.ftc.teamcode.hardware.Intake.*;
 import static org.firstinspires.ftc.teamcode.hardware.Lift.*;
 import android.util.Pair;
+
+import com.outoftheboxrobotics.photoncore.Photon;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import org.firstinspires.ftc.teamcode.command.Command;
 import org.firstinspires.ftc.teamcode.command.FnCommand;
@@ -16,6 +18,7 @@ import org.firstinspires.ftc.teamcode.movement.Pose;
 import org.firstinspires.ftc.teamcode.movement.TrajCommandBuilder;
 import org.firstinspires.ftc.teamcode.movement.Vec;
 import org.firstinspires.ftc.teamcode.vision.PropDetector;
+@Photon
 @Autonomous(name = "BlueParkNear")
 public class BlueParkNear extends AbstractAutonomous {
     private AsymConstraints boardConstraints = new AsymConstraints(60, 80, 40);

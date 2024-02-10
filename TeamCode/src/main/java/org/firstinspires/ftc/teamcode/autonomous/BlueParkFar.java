@@ -5,6 +5,8 @@ import static org.firstinspires.ftc.teamcode.hardware.RobotStateMachine.robotSta
 import static org.firstinspires.ftc.teamcode.hardware.Intake.*;
 import static org.firstinspires.ftc.teamcode.hardware.Lift.*;
 import android.util.Pair;
+
+import com.outoftheboxrobotics.photoncore.Photon;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import org.firstinspires.ftc.teamcode.command.Command;
 import org.firstinspires.ftc.teamcode.command.FnCommand;
@@ -16,6 +18,7 @@ import org.firstinspires.ftc.teamcode.movement.Pose;
 import org.firstinspires.ftc.teamcode.movement.TrajCommandBuilder;
 import org.firstinspires.ftc.teamcode.movement.Vec;
 import org.firstinspires.ftc.teamcode.vision.PropDetector;
+@Photon
 @Autonomous(name = "BlueParkFar")
 public class BlueParkFar extends AbstractAutonomous {
     private AsymConstraints boardConstraints = new AsymConstraints(20, 30, 30);
@@ -59,7 +62,7 @@ public class BlueParkFar extends AbstractAutonomous {
                 .lineTo(mid2.vec())
                 .pause(15)
                 .setMoveConstraints(boardConstraints)
-                .splineTo(board, 0.3)
+                .splineTo(board, 0.5)
                 .marker(FnCommand.once(t -> robot.stateMachine.transition(DEPOSIT, 700, 0)))
                 .pause(1)
                 .marker(FnCommand.once(t -> robot.stateMachine.transition(RETRACT)))

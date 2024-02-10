@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.autonomous;
 import static java.lang.Math.*;
 import static org.firstinspires.ftc.teamcode.hardware.MecanumDrive.*;
 import com.acmerobotics.dashboard.config.Config;
+import com.outoftheboxrobotics.photoncore.Photon;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import org.firstinspires.ftc.teamcode.command.CommandOpMode;
@@ -14,6 +15,7 @@ import org.firstinspires.ftc.teamcode.movement.Pose;
 import org.firstinspires.ftc.teamcode.movement.Vec;
 @Config
 @Disabled
+@Photon
 @Autonomous(name = "TurnFeedforwardTest")
 public class TurnFeedforwardTest extends CommandOpMode {
     public static double width = 12.5;

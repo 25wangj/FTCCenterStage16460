@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.teleop;
 import static java.lang.Math.*;
+
+import com.outoftheboxrobotics.photoncore.Photon;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.command.CommandOpMode;
@@ -7,6 +9,7 @@ import org.firstinspires.ftc.teamcode.command.FnCommand;
 import org.firstinspires.ftc.teamcode.hardware.MecanumDrive;
 import org.firstinspires.ftc.teamcode.movement.Pose;
 import org.firstinspires.ftc.teamcode.movement.Vec;
+@Photon
 @TeleOp(name = "LocalizationTest")
 public class LocalizationTest extends CommandOpMode {
     private MecanumDrive drive;

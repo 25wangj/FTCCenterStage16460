@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.autonomous;
 import static org.firstinspires.ftc.teamcode.hardware.ValueStorage.*;
 import org.firstinspires.ftc.teamcode.command.CommandOpMode;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
-import org.firstinspires.ftc.teamcode.movement.Pose;
 import org.firstinspires.ftc.teamcode.vision.PropDetector;
 public abstract class AbstractAutonomous extends CommandOpMode {
     public enum Case {

@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.autonomous;
 import static java.lang.Math.*;
 import com.acmerobotics.dashboard.config.Config;
+import com.outoftheboxrobotics.photoncore.Photon;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import org.firstinspires.ftc.teamcode.command.Command;
@@ -14,6 +15,7 @@ import org.firstinspires.ftc.teamcode.movement.TrajCommandBuilder;
 import org.firstinspires.ftc.teamcode.movement.Vec;
 @Config
 @Disabled
+@Photon
 @Autonomous(name = "MovePidTest")
 public class MovePidTest extends CommandOpMode {
     public static double dist = 96;

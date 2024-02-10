@@ -22,7 +22,7 @@ public class Robot {
         stateMachine = RobotStateMachine.get(opMode, this, INTAKE_OPEN);
         opMode.register(drive, intake, lift, climb);
         if (!auto) {
-            intake.setPower(intakeOpen);
+            intake.setPower(1);
         }
         intake.setRoller(rollerDown);
         intake.setGate(gateOpen);

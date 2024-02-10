@@ -111,7 +111,7 @@ public class TrajCommandBuilder {
         return splineTo(end, t, end.combo(1, pos.vec(), -1).norm());
     }
     public TrajCommandBuilder splineTo(Pose end, double t, double v) {
-        addTraj(new Spline(pos.vec(), tangent.mult(v), end.vec(), Vec.dir(end.h).mult(v)), end.h);
+        addTraj(new Spline(pos.vec(), tangent.mult(v), end.vec(), Vec.dir(t).mult(v)), end.h);
         return this;
     }
     public TrajCommandBuilder splineTo(Vec end, double t, double v) {

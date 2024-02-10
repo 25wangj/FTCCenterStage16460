@@ -5,12 +5,14 @@ import static org.firstinspires.ftc.teamcode.hardware.ValueStorage.*;
 import static org.firstinspires.ftc.teamcode.hardware.Intake.*;
 import static org.firstinspires.ftc.teamcode.hardware.Lift.*;
 import static org.firstinspires.ftc.teamcode.hardware.RobotStateMachine.robotStates.*;
+import com.outoftheboxrobotics.photoncore.Photon;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.command.CommandOpMode;
 import org.firstinspires.ftc.teamcode.command.FnCommand;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
 import org.firstinspires.ftc.teamcode.movement.Vec;
 import org.firstinspires.ftc.teamcode.command.RisingEdgeDetector;
+@Photon
 @TeleOp(name = "OneDriver")
 public class TeleopOneDriver extends CommandOpMode {
     private Robot robot;
@@ -64,7 +66,7 @@ public class TeleopOneDriver extends CommandOpMode {
                     } else if (robot.stateMachine.state() == INTAKE_OPEN) {
                         robot.stateMachine.transition(DEPOSIT, lastLiftPos, lastArmPos);
                     } else if (robot.stateMachine.state() == DEPOSIT) {
-                        robot.stateMachine.transition(RETRACT);
+                        robot.stateMachine.transition(RETRACT, 0);
                     } else if (robot.stateMachine.state() == RETRACT) {
                         robot.stateMachine.transition(INTAKE_OPEN);
                     }})),
@@ -111,7 +113,7 @@ public class TeleopOneDriver extends CommandOpMode {
     private static double armPos(boolean left, boolean right) {
         if (left) {
             return armLeft;
-        } else if (right) {
+        } else if (right) { 
             return armRight;
         }
         return 0;

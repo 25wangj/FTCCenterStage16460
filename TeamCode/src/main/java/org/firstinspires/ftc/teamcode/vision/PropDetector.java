@@ -11,7 +11,7 @@ public class PropDetector {
     public PropDetector(LinearOpMode opMode, boolean right, Side side) {
         proc = new ColorPropProcessor(right, side);
         portal = new VisionPortal.Builder()
-                .setCamera(opMode.hardwareMap.get(WebcamName.class, "camera"))
+                .setCamera(opMode.hardwareMap.get(WebcamName.class, "camera1"))
                 .setCameraResolution(new Size(640, 480))
                 .addProcessor(proc)
                 .enableLiveView(true)
