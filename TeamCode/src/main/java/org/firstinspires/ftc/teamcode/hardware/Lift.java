@@ -27,9 +27,9 @@ public class Lift implements Subsystem {
     public static final double armRight = 360;
     public static final double clawClosed = 0.7;
     public static final double clawOpen = 0.47;
-    public static final PidCoefficients liftCoeffs = new PidCoefficients(0.02, 0.01, 0);
+    public static final PidCoefficients liftCoeffs = new PidCoefficients(0.015, 0.01, 0.0002);
     public static final ToDoubleFunction<double[]> liftKf = x -> (x[0] > 80 ? 0.15 + 0.0001 * x[0] : -0.1) + 0.00001 * x[2];
-    public static final PidCoefficients armCoeffs = new PidCoefficients(0.015, 0.01, 0);
+    public static final PidCoefficients armCoeffs = new PidCoefficients(0.01, 0.01, 0.0002);
     public static final ToDoubleFunction<double[]> armKf = x -> 0.000005 * x[2];
     public static final AsymConstraints liftConstraints = new AsymConstraints(3500, 30000, 20000);
     public static final AsymConstraints armConstraints = new AsymConstraints(3000, 30000, 20000);

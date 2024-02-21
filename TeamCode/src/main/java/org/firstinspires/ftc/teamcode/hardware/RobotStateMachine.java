@@ -35,7 +35,7 @@ public class RobotStateMachine {
                         robot.intake.setGate(gateOpen);
                         robot.intake.setPower(0);}, 0.2, subsystems),
                     new WaitCommand(t -> robot.intake.setPower(1), 0.4, subsystems),
-                    new WaitCommand(t -> robot.intake.setPower(-0.5), 0.1, subsystems),
+                    new WaitCommand(t -> robot.intake.setPower(-0.5), 0.15, subsystems),
                     FnCommand.once(t -> robot.intake.setPower(1), subsystems)))
                 .addTransition(robotStates.INTAKE_OPEN, robotStates.INTAKE_CLOSED, new WaitCommand(t -> {
                 robot.intake.setGate(gateClosed);
@@ -45,11 +45,12 @@ public class RobotStateMachine {
                 new WaitCommand(t -> robot.intake.setGate(gateUp), 0.25, subsystems),
                 FnCommand.once(t -> {
                     robot.lift.setClaw(clawClosed);
-                    robot.intake.setPower(0);}, subsystems),
-                robot.lift.goTo(d[0], d[1], 0.25)))
+                    robot.intake.setPower(-0.5);}, subsystems),
+                robot.lift.goTo(d[0], d[1], 0.25),
+                FnCommand.once(t -> robot.intake.setPower(0), subsystems)))
                 .addTransition(robotStates.DEPOSIT, robotStates.RETRACT, d -> {
                     if (d[0] == 0) {
-                        return new SeqCommand(new WaitCommand(t -> robot.lift.setClaw(clawOpen), 0.1, subsystems),
+                        return new SeqCommand(new WaitCommand(t -> robot.lift.setClaw(clawOpen), 0.08, subsystems),
                             new WaitCommand(t -> robot.lift.setClaw(clawClosed), 0.15, subsystems),
                             new WaitCommand(t -> robot.lift.setClaw(clawOpen), 0.15, subsystems));
                     } else {

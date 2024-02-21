@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.hardware;
 import static java.lang.Math.*;
 import androidx.annotation.GuardedBy;
 import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -25,12 +24,10 @@ public class MecanumDrive extends AbstractMecanumDrive {
     public static final double driveKa = 0.003;
     public static final double driveKs = 0;
     public static final double strafeMult = 1.35;
-    public static final PidCoefficients moveCoeffs = new PidCoefficients(0.07, 0, 0);
+    public static final PidCoefficients moveCoeffs = new PidCoefficients(0.2, 0, 0);
     public static final PidCoefficients turnCoeffs = new PidCoefficients(2, 0, 0);
-    public static final AsymConstraints moveConstraints = new AsymConstraints(60, 80, 80);
+    public static final AsymConstraints moveConstraints = new AsymConstraints(60, 70, 70);
     public static final AsymConstraints turnConstraints = new AsymConstraints(6, 12, 12);
-    public static final RevHubOrientationOnRobot orientation = new RevHubOrientationOnRobot
-            (RevHubOrientationOnRobot.LogoFacingDirection.LEFT, RevHubOrientationOnRobot.UsbFacingDirection.UP);
     private final Object gyroLock = new Object();
     @GuardedBy("gyroLock")
     private BNO055IMU gyro;
@@ -54,29 +51,30 @@ public class MecanumDrive extends AbstractMecanumDrive {
             Encoder perp = new Encoder(opMode.hardwareMap.get(DcMotorEx.class, "bl"));
             par1.setDirection(Encoder.Direction.REVERSE);
             localizer = new ThreeWheelLocalizer(par1, par2, perp, parDist, perpDist, 2 * PI * wheelRad / ticks);
-        } else {
-            gyro = opMode.hardwareMap.get(BNO055IMU.class, "gyro");
-            synchronized (gyroLock) {
-                BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-                parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
-                gyro.initialize(parameters);
-            }
-            Thread gyroThread = new Thread(() -> {
-                while (!opMode.isStarted() && !opMode.isStopRequested()) {}
-                while (opMode.opModeIsActive()) {
-                    synchronized (gyroLock) {
-                        heading = gyro.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS).firstAngle;
-                    }
-                }
-            });
-            gyroThread.start();
         }
+        gyro = opMode.hardwareMap.get(BNO055IMU.class, "gyro");
+        synchronized (gyroLock) {
+            BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+            parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
+            gyro.initialize(parameters);
+        }
+        Thread gyroThread = new Thread(() -> {
+            while (!opMode.isStarted() && !opMode.isStopRequested()) {}
+            while (opMode.opModeIsActive()) {
+                synchronized (gyroLock) {
+                    heading = gyro.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS).firstAngle;
+                }
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {}
+            }
+        });
+        gyroThread.start();
     }
     public void setHeading(double h) {
         offset = h - heading;
     }
     public double getHeading() {
-        //heading = gyro.getRobotOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS).firstAngle;
         return offset + heading;
     }
 }

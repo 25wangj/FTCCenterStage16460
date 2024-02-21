@@ -9,6 +9,9 @@ public class ThreeWheelLocalizer implements Localizer {
     private Encoder enc2;
     private Encoder enc3;
     private double lastTime = Double.NaN;
+    private double last1;
+    private double last2;
+    private double last3;
     private double f;
     private SimpleMatrix invKin;
     private SimpleMatrix integ = new SimpleMatrix(3, 3);
@@ -43,14 +46,14 @@ public class ThreeWheelLocalizer implements Localizer {
     }
     @Override
     public void update(double time) {
-        double v1 = f * enc1.getVelocity(time);
-        double v2 = f * enc2.getVelocity(time);
-        double v3 = f * enc3.getVelocity(time);
-        if (v1 == 0 && v2 == 0 && v3 == 0) {
+        double p1 = f * enc1.getPosition();
+        double p2 = f * enc2.getPosition();
+        double p3 = f * enc3.getPosition();
+        if (p1 == last1 && p2 == last2 && p3 == last3) {
             vel = new Pose(0, 0, 0);
         } else if (!Double.isNaN(lastTime)) {
             double dt = time - lastTime;
-            SimpleMatrix local = invKin.mult(new SimpleMatrix(new double[][]{{v1 * dt}, {v2 * dt}, {v3 * dt}}));
+            SimpleMatrix local = invKin.mult(new SimpleMatrix(new double[] {p1 - last1, p2 - last2, p3 - last3}));
             rot.set(0, 0, cos(pos.h));
             rot.set(0, 1, -sin(pos.h));
             rot.set(1, 0, sin(pos.h));
@@ -73,5 +76,8 @@ public class ThreeWheelLocalizer implements Localizer {
             vel = new Pose(nVel.get(0, 0), nVel.get(1, 0), nVel.get(2, 0));
         }
         lastTime = time;
+        last1 = p1;
+        last2 = p2;
+        last3 = p3;
     }
 }

@@ -11,11 +11,18 @@ import org.firstinspires.ftc.teamcode.movement.Pose;
 import org.firstinspires.ftc.teamcode.movement.Vec;
 @Photon
 @TeleOp(name = "LocalizationTest")
-public class LocalizationTest extends CommandOpMode {
-    private MecanumDrive drive;
-    @Override
+public class LocalizationTest extends CommandOpMode { @Override
     public void initOpMode() {
-        drive = new MecanumDrive(this, true);
+        int config = 0;
+        while (config == 0) {
+            telemetry.addLine("Press a for deadwheels, b for tags");
+            if (gamepad1.a) {
+                config = 1;
+            } else if (gamepad1.b) {
+                config = 2;
+            }
+        }
+        MecanumDrive drive = new MecanumDrive(this, true);
         scheduler.register(drive);
         scheduler.schedule(FnCommand.repeat(t -> {
             Vec v = new Vec(-gamepad1.left_stick_y, -gamepad1.left_stick_x);

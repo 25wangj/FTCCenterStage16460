@@ -22,4 +22,8 @@ public class WaitTrajectory implements Trajectory {
     public double tf() {
         return ti + seconds;
     }
+    @Override
+    public double[] tfs() {
+        return new double[] {0, seconds};
+    }
 }

@@ -23,4 +23,7 @@ public class TurnTrajectory implements Trajectory {
     public double tf() {
         return profile.tf() + ti;
     }
+    public double[] tfs() {
+        return new double[] {0, profile.tf()};
+    }
 }

@@ -1,4 +1,7 @@
 package org.firstinspires.ftc.teamcode.movement;
+import static java.lang.Double.NaN;
+import static java.lang.Double.isNaN;
+import static java.lang.Math.*;
 import org.firstinspires.ftc.teamcode.command.Command;
 import org.firstinspires.ftc.teamcode.command.Scheduler;
 import org.firstinspires.ftc.teamcode.control.AsymConstraints;
@@ -15,23 +18,31 @@ public class TrajCommandBuilder {
     private double vf;
     private AsymConstraints moveConstraints;
     private AsymConstraints turnConstraints;
+    private boolean compound;
+    private List<Path> paths = new ArrayList<>();
+    private List<Double> headings = new ArrayList<>();
+    private List<List<Double>> scales = new ArrayList<>();
+    private List<List<Double>> offsets = new ArrayList<>();
     private List<Trajectory> trajs = new ArrayList<>();
-    private List<Double> endTimes = new ArrayList<>(Arrays.asList(0d));
+    private List<Double> times = new ArrayList<>(Arrays.asList(0d));
     private List<List<Command>> markers = new ArrayList<>();
-    private List<List<Double>> times = new ArrayList<>();
+    private List<List<Double>> mTimes = new ArrayList<>();
     private List<Command> globalMarkers = new ArrayList<>();
-    private List<Double> globalTimes = new ArrayList<>();
+    private List<Double> globalScales = new ArrayList<>();
+    private List<Double> globalOffsets = new ArrayList<>();
     public TrajCommandBuilder(Drivetrain drive, Pose pos) {
         this.drive = drive;
         this.pos = pos;
-        this.tangent = Vec.dir(pos.h);
+        tangent = Vec.dir(pos.h);
+        headings.add(pos.h);
         moveConstraints = drive.getMoveConstraints();
         turnConstraints = drive.getTurnConstraints();
     }
     public TrajCommandBuilder(Drivetrain drive, Pose pos, Vec vel) {
         this.drive = drive;
         this.pos = pos;
-        this.tangent = vel.normalize();
+        tangent = vel.normalize();
+        headings.add(pos.h);
         vi = vel.norm();
         moveConstraints = drive.getMoveConstraints();
         turnConstraints = drive.getTurnConstraints();
@@ -40,8 +51,8 @@ public class TrajCommandBuilder {
         tangent = Vec.dir(h);
         return this;
     }
-    public TrajCommandBuilder setVf(double vf) {
-        this.vf = vf;
+    public TrajCommandBuilder setVel(double v) {
+        vf = v;
         return this;
     }
     public TrajCommandBuilder setMoveConstraints(AsymConstraints moveConstraints) {
@@ -58,50 +69,75 @@ public class TrajCommandBuilder {
         return this;
     }
     public TrajCommandBuilder pause(double t) {
+        if (isNaN(vf)) {
+            throw new IllegalStateException("Compound path must be closed");
+        }
+        compound = false;
         pos = new Pose(pos.vec().combo(1, tangent, vi * t), pos.h);
         vf = 0;
-        endTimes.add(endTimes.get(endTimes.size() - 1) + t);
+        times.add(times.get(times.size() - 1) + t);
         trajs.add(new WaitTrajectory(pos, tangent.mult(vi), t));
         markers.add(new ArrayList<>());
-        times.add(new ArrayList<>());
+        mTimes.add(new ArrayList<>());
         return this;
     }
     public TrajCommandBuilder turn(double h) {
+        if (isNaN(vf)) {
+            throw new IllegalStateException("Compound path must be closed");
+        }
         if (vi != 0) {
             throw new IllegalArgumentException("Must be stationary to turn");
         }
+        compound = false;
         Trajectory traj = new TurnTrajectory(turnConstraints, pos, h);
         pos = new Pose(pos.vec(), h);
         tangent = Vec.dir(pos.h);
+        headings = new ArrayList<>(Arrays.asList(pos.h));
         vf = 0;
-        endTimes.add(endTimes.get(endTimes.size() - 1) + traj.tf());
+        times.add(times.get(times.size() - 1) + traj.tf());
         trajs.add(traj);
         markers.add(new ArrayList<>());
-        times.add(new ArrayList<>());
+        mTimes.add(new ArrayList<>());
         return this;
     }
     public TrajCommandBuilder lineTo(Pose end) {
-        addTraj(new Line(pos.vec(), end.vec()), end.h);
+        addTraj(new LinePath(pos.vec(), end.vec()), end.h);
         return this;
     }
     public TrajCommandBuilder lineTo(Vec end) {
-        addTraj(new Line(pos.vec(), end));
+        addTraj(new LinePath(pos.vec(), end), NaN);
         return this;
     }
     public TrajCommandBuilder lineToX(double x, double h) {
-        addTraj(Line.extendX(pos.vec(), tangent, x), h);
+        addTraj(LinePath.extendX(pos.vec(), tangent, x), h);
         return this;
     }
     public TrajCommandBuilder lineToX(double x) {
-        addTraj(Line.extendX(pos.vec(), tangent, x));
+        addTraj(LinePath.extendX(pos.vec(), tangent, x), NaN);
         return this;
     }
     public TrajCommandBuilder lineToY(double y, double h) {
-        addTraj(Line.extendY(pos.vec(), tangent, y), h);
+        addTraj(LinePath.extendY(pos.vec(), tangent, y), h);
         return this;
     }
     public TrajCommandBuilder lineToY(double y) {
-        addTraj(Line.extendY(pos.vec(), tangent, y));
+        addTraj(LinePath.extendY(pos.vec(), tangent, y), NaN);
+        return this;
+    }
+    public TrajCommandBuilder forward(double d) {
+        lineTo(pos.vec().combo(1, Vec.dir(pos.h), d));
+        return this;
+    }
+    public TrajCommandBuilder back(double d) {
+        lineTo(pos.vec().combo(1, Vec.dir(pos.h + PI), d));
+        return this;
+    }
+    public TrajCommandBuilder right(double d) {
+        lineTo(pos.vec().combo(1, Vec.dir(pos.h - PI / 2), d));
+        return this;
+    }
+    public TrajCommandBuilder left(double d) {
+        lineTo(pos.vec().combo(1, Vec.dir(pos.h + PI / 2), d));
         return this;
     }
     public TrajCommandBuilder splineTo(Pose end, double t) {
@@ -111,11 +147,11 @@ public class TrajCommandBuilder {
         return splineTo(end, t, end.combo(1, pos.vec(), -1).norm());
     }
     public TrajCommandBuilder splineTo(Pose end, double t, double v) {
-        addTraj(new Spline(pos.vec(), tangent.mult(v), end.vec(), Vec.dir(t).mult(v)), end.h);
+        addTraj(new SplinePath(pos.vec(), tangent.mult(v), end.vec(), Vec.dir(t).mult(v)), end.h);
         return this;
     }
     public TrajCommandBuilder splineTo(Vec end, double t, double v) {
-        addTraj(new Spline(pos.vec(), tangent.mult(v), end, Vec.dir(t).mult(v)));
+        addTraj(new SplinePath(pos.vec(), tangent.mult(v), end, Vec.dir(t).mult(v)), NaN);
         return this;
     }
     public TrajCommandBuilder marker(Command command) {
@@ -124,43 +160,59 @@ public class TrajCommandBuilder {
     public TrajCommandBuilder marker(double scale, double offset, Command command) {
         if (trajs.isEmpty()) {
             globalMarkers.add(command);
-            globalTimes.add(scale);
-            globalTimes.add(offset);
-        } else {
+            globalScales.add(scale);
+            globalOffsets.add(offset);
+        } else if (compound) {
             markers.get(markers.size() - 1).add(command);
-            times.get(markers.size() - 1).add(endTimes.get(endTimes.size() - 2) +
-                    (endTimes.get(endTimes.size() - 1) - endTimes.get(endTimes.size() - 2)) * scale + offset);
+            scales.get(scales.size() - 1).add(scale);
+            offsets.get(offsets.size() - 1).add(offset);
+        } else {
+            double[] tfs = trajs.get(trajs.size() - 1).tfs();
+            markers.get(markers.size() - 1).add(command);
+            mTimes.get(mTimes.size() - 1).add(times.get(times.size() - 2) + tfs[tfs.length - 2] +
+                    (tfs[tfs.length - 1] - tfs[tfs.length - 2]) * scale + offset);
         }
         return this;
     }
-    private void addTraj(Path p) {
-        Trajectory traj = new PathTrajectory(p, moveConstraints, vi, vf, pos.h);
-        pos = new Pose(p.state(1).pos, pos.h - p.state(0).vel.angle() + p.state(1).vel.angle());
-        tangent = vf == 0 ? Vec.dir(pos.h) : p.state(1).vel.normalize();
-        vi = vf;
+    private void addTraj(Path p, double h) {
+        if (paths.isEmpty()) {
+            markers.add(new ArrayList<>());
+        }
+        paths.add(p);
+        headings.add(h);
+        pos = new Pose(p.state(1).pos, isNaN(h) ? pos.h - p.state(0).dir.angle() + p.state(1).dir.angle() : h);
+        tangent = vf == 0 ? Vec.dir(pos.h) : p.state(1).dir;
+        if (isNaN(vf)) {
+            compound = true;
+            scales.add(new ArrayList<>());
+            offsets.add(new ArrayList<>());
+        } else {
+            compound = false;
+            PathTrajectory traj = new PathTrajectory(paths.toArray(new Path[0]), headings.stream().mapToDouble(i -> i).toArray(),
+                    moveConstraints, turnConstraints, vi, vf);
+            trajs.add(traj);
+            mTimes.add(new ArrayList<>());
+            System.out.println(Arrays.toString(traj.tfs()));
+            for (int i = 0; i < scales.size(); i++) {
+                for (int j = 0; j < scales.get(i).size(); j++) {
+                    mTimes.get(mTimes.size() - 1).add(times.get(times.size() - 1) + traj.tfs()[i] +
+                            (traj.tfs()[i + 1] - traj.tfs()[i]) * scales.get(i).get(j) + offsets.get(i).get(j));
+                }
+            }
+            headings = new ArrayList<>(Arrays.asList(pos.h));
+            paths.clear();
+            scales.clear();
+            offsets.clear();
+            times.add(times.get(times.size() - 1) + traj.tf());
+            vi = vf;
+        }
         vf = 0;
-        endTimes.add(endTimes.get(endTimes.size() - 1) + traj.tf());
-        trajs.add(traj);
-        markers.add(new ArrayList<>());
-        times.add(new ArrayList<>());
-    }
-    private void addTraj(Path p, double hf) {
-        Trajectory traj = new PathTrajectory(p, moveConstraints, turnConstraints, vi, vf, pos.h, hf);
-        pos = new Pose(p.state(1).pos, hf);
-        tangent = vf == 0 ? Vec.dir(pos.h) : p.state(1).vel.normalize();
-        vi = vf;
-        vf = 0;
-        endTimes.add(endTimes.get(endTimes.size() - 1) + traj.tf());
-        trajs.add(traj);
-        markers.add(new ArrayList<>());
-        times.add(new ArrayList<>());
     }
     public Command build(Scheduler scheduler) {
         for (int i = 0; i < globalMarkers.size(); i++) {
             markers.get(0).add(globalMarkers.get(i));
-            times.get(0).add(globalTimes.get(2 * i) * endTimes.get(endTimes.size() - 1) + globalTimes.get(2 * i + 1));
+            mTimes.get(0).add(globalScales.get(i) * times.get(times.size() - 1) + globalOffsets.get(i));
         }
-        System.out.println(endTimes);
         return new Command(drive) {
             private int index;
             private double ti;
@@ -174,17 +226,17 @@ public class TrajCommandBuilder {
                 drive.setTrajectory(trajs.get(0));
                 currMarkers = new HashMap<>();
                 for (int i = 0; i < markers.get(0).size(); i++) {
-                    currMarkers.put(markers.get(0).get(i), times.get(0).get(i) + ti);
+                    currMarkers.put(markers.get(0).get(i), mTimes.get(0).get(i) + ti);
                 }
             }
             @Override
             public void run(double time) {
-                if (index != trajs.size() - 1 && time > ti + endTimes.get(index + 1)) {
+                if (index != trajs.size() - 1 && time > ti + times.get(index + 1)) {
                     index++;
-                    trajs.get(index).setTi(endTimes.get(index) + ti);
+                    trajs.get(index).setTi(times.get(index) + ti);
                     drive.setTrajectory(trajs.get(index));
                     for (int i = 0; i < markers.get(index).size(); i++) {
-                        currMarkers.put(markers.get(index).get(i), times.get(index).get(i) + ti);
+                        currMarkers.put(markers.get(index).get(i), mTimes.get(index).get(i) + ti);
                     }
                 }
                 for (Map.Entry<Command, Double> p : currMarkers.entrySet()) {
@@ -208,7 +260,7 @@ public class TrajCommandBuilder {
             }
             @Override
             public boolean done(double time) {
-                return time > ti + endTimes.get(endTimes.size() - 1);
+                return time > ti + times.get(times.size() - 1);
             }
         };
     }

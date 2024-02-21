@@ -70,4 +70,13 @@ public class AsymProfile extends MotionProfile {
     public static AsymProfile extendAsym(MotionProfile p, AsymConstraints c, double xf, double vf) {
         return extendAsym(p, c, p.tf, xf, vf);
     }
+    public double t1() {
+        return t1;
+    }
+    public double t2() {
+        return t2;
+    }
+    public AsymConstraints c() {
+        return c;
+    }
 }

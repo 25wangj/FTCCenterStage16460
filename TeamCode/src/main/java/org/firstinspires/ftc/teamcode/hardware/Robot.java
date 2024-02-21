@@ -21,10 +21,12 @@ public class Robot {
         climb = new Climb(opMode, auto);
         stateMachine = RobotStateMachine.get(opMode, this, INTAKE_OPEN);
         opMode.register(drive, intake, lift, climb);
-        if (!auto) {
+        if (auto) {
+            intake.setRoller(rollerPress);
+        } else {
+            intake.setRoller(rollerDown);
             intake.setPower(1);
         }
-        intake.setRoller(rollerDown);
         intake.setGate(gateOpen);
         lift.setClaw(clawOpen);
         climb.setLatch(latchClosed);

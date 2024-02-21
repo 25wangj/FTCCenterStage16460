@@ -1,9 +1,5 @@
 package org.firstinspires.ftc.teamcode.movement;
 import static java.lang.Math.*;
-
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.canvas.Canvas;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import org.firstinspires.ftc.teamcode.control.AsymConstraints;
 import org.firstinspires.ftc.teamcode.control.PidCoefficients;

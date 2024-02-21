@@ -2,19 +2,20 @@ package org.firstinspires.ftc.teamcode.autonomous;
 import static org.firstinspires.ftc.teamcode.hardware.ValueStorage.*;
 import org.firstinspires.ftc.teamcode.command.CommandOpMode;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
-import org.firstinspires.ftc.teamcode.vision.PropDetector;
+import org.firstinspires.ftc.teamcode.vision.Vision;
 public abstract class AbstractAutonomous extends CommandOpMode {
     public enum Case {
         LEFT, CENTER, RIGHT
     }
     public static final int minDetected = 10;
     protected Robot robot;
-    protected PropDetector detector;
+    protected Vision vision;
     protected Side side;
     protected Case runCase = Case.CENTER;
     private Case detectCase = Case.CENTER;
     private int detected = 0;
     public abstract void initAutonomous();
+    public void waitAutonomous() {}
     @Override
     public void initOpMode() {
         robot = new Robot(this, true);
@@ -22,10 +23,11 @@ public abstract class AbstractAutonomous extends CommandOpMode {
     }
     @Override
     public void waitOpMode() {
-        if (detectCase == detector.getCase()) {
+        waitAutonomous();
+        if (detectCase == vision.getCase()) {
             detected++;
         } else {
-            detectCase = detector.getCase();
+            detectCase = vision.getCase();
             detected = 0;
         }
         if (detected >= minDetected) {
@@ -36,7 +38,7 @@ public abstract class AbstractAutonomous extends CommandOpMode {
     }
     @Override
     public void startOpMode() {
-        detector.close();
+        vision.close();
     }
     @Override
     public void endOpMode() {
