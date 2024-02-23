@@ -1,14 +1,14 @@
 package org.firstinspires.ftc.teamcode.control;
 import org.ejml.simple.SimpleMatrix;
 public class KalmanEstimate {
-    public final SimpleMatrix est;
-    public final SimpleMatrix obs;
-    public final SimpleMatrix cov;
-    public final long time;
-    public KalmanEstimate(SimpleMatrix est, SimpleMatrix obs, SimpleMatrix cov, long time) {
-        this.est = est;
-        this.obs = obs;
-        this.cov = cov;
+    public final SimpleMatrix z;
+    public final SimpleMatrix H;
+    public final SimpleMatrix R;
+    public final double time;
+    public KalmanEstimate(SimpleMatrix z, SimpleMatrix H, SimpleMatrix R, double time) {
+        this.z = z;
+        this.H = H;
+        this.R = R;
         this.time = time;
     }
 }

@@ -1,4 +1,5 @@
 package org.firstinspires.ftc.teamcode.movement;
+import org.ejml.simple.SimpleMatrix;
 public class Pose {
     public final double x;
     public final double y;
@@ -10,6 +11,11 @@ public class Pose {
     }
     public Pose(Vec v, double h) {
         this(v.x, v.y, h);
+    }
+    public Pose(SimpleMatrix m) {
+        x = m.get(0);
+        y = m.get(1);
+        h = m.get(2);
     }
     public Vec vec() {
         return new Vec(x, y);

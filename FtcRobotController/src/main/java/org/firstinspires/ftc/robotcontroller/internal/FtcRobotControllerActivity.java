@@ -131,7 +131,7 @@ import org.xmlpull.v1.XmlPullParserException;
 import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 @SuppressWarnings("WeakerAccess")
 public class FtcRobotControllerActivity extends Activity
@@ -297,7 +297,7 @@ public class FtcRobotControllerActivity extends Activity
 
     PreferenceRemoterRC.getInstance().start(prefRemoterStartResult);
 
-    receivedUsbAttachmentNotifications = new ConcurrentLinkedQueue<UsbDevice>();
+    receivedUsbAttachmentNotifications = new LinkedBlockingQueue<UsbDevice>();
     eventLoop = null;
 
     setContentView(R.layout.activity_ftc_controller);

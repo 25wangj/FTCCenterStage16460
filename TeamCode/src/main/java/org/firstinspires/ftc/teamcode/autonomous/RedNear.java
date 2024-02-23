@@ -53,8 +53,9 @@ public class RedNear extends AbstractAutonomous {
             }
         }
         side = Side.RED;
-        vision = new Vision(this, true, false, side);
+        vision = new Vision(this, true, false, side, robot.drive::getHeading);
         robot.drive.setPose(start);
+        robot.drive.setHeading(start.h);
         Command traj1Left = new TrajCommandBuilder(robot.drive, start)
                 .lineTo(left)
                 .pause(0.25)
