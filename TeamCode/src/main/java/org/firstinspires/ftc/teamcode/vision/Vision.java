@@ -14,12 +14,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.DoubleSupplier;
 public class Vision {
     public static final long exposure = 20;
-    public static final SimpleMatrix camMat1 = new SimpleMatrix(new double[][] {{687, 0, 332}, {0, 687, 245}, {0, 0, 1}});
+    public static final SimpleMatrix camMat1 = new SimpleMatrix(new double[][] {{687, 0, 308}, {0, 687, 235}, {0, 0, 1}});
     public static final SimpleMatrix camMat2 = new SimpleMatrix(new double[][] {{813, 0, 311}, {0, 813, 231}, {0, 0, 1}});
-    public static final double[] camPos1 = {6.0, 0.7, 3.4};
+    public static final double[] camPos1 = {6.0, 0.7, 3.373};
     public static final double[] camPos2 = {0, 0, 0};
-    public static final double[] camRot1 = {0, PI / 2, PI};
-    public static final double[] camRot2 = {0, PI / 2, 0};
+    public static final double[] camRot1 = {0, 1.571, 1.574};
+    public static final double[] camRot2 = {PI, PI / 2, -PI / 2};
     public static final HashMap<Integer, double[][]> tagPts = new HashMap<>(Map.of(
             1, new double[][] {{62, 42.5, 3.134}, {63, 42.5, 4.866}, {63, 40.5, 4.866}, {62, 40.5, 3.134}},
             2, new double[][] {{62, 36.5, 3.134}, {63, 36.5, 4.866}, {63, 34.5, 4.866}, {62, 34.5, 3.134}},

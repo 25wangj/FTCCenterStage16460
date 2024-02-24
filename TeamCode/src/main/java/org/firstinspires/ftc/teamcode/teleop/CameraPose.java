@@ -20,20 +20,21 @@ import org.firstinspires.ftc.vision.VisionProcessor;
 import org.opencv.calib3d.Calib3d;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint2f;
+import org.opencv.core.Point;
+import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.core.TermCriteria;
 import org.opencv.imgproc.Imgproc;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 @TeleOp(name = "CameraPose")
 public class CameraPose extends CommandOpMode {
-    private double EPS = 1e-6;
     private double squareSize = 1.142;
-    private double h1 = 2.731;
-    private Size size = new Size(7, 5);
-    private double[] dists = {12, 18, 24, 30, 36, 42, 48};
-    private boolean flip;
+    private double h1 = 7.918;
+    private Size size = new Size(6, 5);
+    private double[] dists = {18, 24, 30, 36, 42, 48};
     private List<SimpleMatrix> imgPts = new ArrayList<>();
     private List<Double> ds = new ArrayList<>();
     private List<Double> hs = new ArrayList<>();
@@ -41,7 +42,7 @@ public class CameraPose extends CommandOpMode {
     private MatOfPoint2f corners = new MatOfPoint2f();
     private RisingEdgeDetector a;
     private SimpleMatrix invCamMat;
-    private int i = 0;
+    private int ind = 0;
     @Override
     public void initOpMode() {
         a = new RisingEdgeDetector(() -> gamepad1.a);
@@ -51,11 +52,9 @@ public class CameraPose extends CommandOpMode {
             telemetry.update();
             if (gamepad1.a) {
                 cam = "camera1";
-                flip = true;
                 invCamMat = Vision.camMat1.invert();
-            } else {
+            } else if (gamepad1.b){
                 cam = "camera2";
-                flip = false;
                 invCamMat = Vision.camMat2.invert();
             }
         }
@@ -69,22 +68,19 @@ public class CameraPose extends CommandOpMode {
                 if (Calib3d.findChessboardCorners(frame, size, corners, Calib3d.CALIB_CB_ADAPTIVE_THRESH)) {
                     Imgproc.cornerSubPix(gray, corners, new Size(11, 11), new Size(-1, -1),
                             new TermCriteria(TermCriteria.EPS, 30, 0.001));
+                    Calib3d.drawChessboardCorners(frame, size, corners, true);
+                    Imgproc.circle(frame, new Point(corners.get(0, 0)), 0, new Scalar(255, 0, 0), 3);
                     if (a.getAsBoolean()) {
                         for (int i = 0; i < size.height; i++) {
                             for (int j = 0; j < size.width; j++) {
-                                SimpleMatrix pt;
-                                if (flip) {
-                                    pt = new SimpleMatrix(new double[]{-corners.get(j, i)[0], -corners.get(j, i)[1], 1});
-                                } else {
-                                    pt = new SimpleMatrix(new double[]{corners.get(j, i)[0], corners.get(j, i)[1], 1});
-                                }
-                                imgPts.add(invCamMat.mult(pt));
-                                hs.add(h1 + i * squareSize);
+                                double[] corner = corners.get(i * (int)size.width + j, 0);
+                                imgPts.add(invCamMat.mult(new SimpleMatrix(new double[]{corner[0], corner[1], 1})));
+                                hs.add(h1 - i * squareSize);
                                 double x = (j - (size.width - 1) / 2) * squareSize;
-                                ds.add(sqrt(x * x + dists[i] * dists[i]));
+                                ds.add(sqrt(x * x + dists[ind] * dists[ind]));
                             }
                         }
-                        i++;
+                        ind++;
                     }
                 }
                 return null;
@@ -100,39 +96,47 @@ public class CameraPose extends CommandOpMode {
         while (portal.getCameraState() != VisionPortal.CameraState.STREAMING) {};
         portal.getCameraControl(ExposureControl.class).setMode(ExposureControl.Mode.Manual);
         portal.getCameraControl(ExposureControl.class).setExposure(50, TimeUnit.MILLISECONDS);
-        while (i < dists.length) {
-            telemetry.addLine("Place the camera " + dists[i] + "in away from the board");
+        while (ind < dists.length) {
+            telemetry.addLine("Place the camera " + dists[ind] + "in away from the board");
             telemetry.addLine("Press a to capture an image");
+            telemetry.update();
         }
         LeastSquaresProblem lsq = new LeastSquaresBuilder()
                 .model(this::error, this::jac)
-                .start(new double[] {0, PI / 2})
+                .start(new double[] {4, PI / 2, -PI / 2})
+                .target(new double[imgPts.size()])
+                .maxEvaluations(100)
+                .maxIterations(100)
                 .build();
-        LeastSquaresOptimizer.Optimum opt = new LevenbergMarquardtOptimizer().withCostRelativeTolerance(1e-6).optimize(lsq);
+        LeastSquaresOptimizer.Optimum opt = new LevenbergMarquardtOptimizer().optimize(lsq);
         while (!isStopRequested()) {
             telemetry.addData("Estimated height", opt.getPoint().getEntry(0));
             telemetry.addData("Estimated pitch", opt.getPoint().getEntry(1));
+            telemetry.addData("Estimated roll", opt.getPoint().getEntry(2));
             telemetry.update();
         }
     }
     public double[] error(double[] vars) {
         double[] error = new double[imgPts.size()];
         SimpleMatrix rBeta = new SimpleMatrix(new double[][] {{cos(vars[1]), 0, sin(vars[1])}, {0, 1, 0}, {-sin(vars[1]), 0, cos(vars[1])}});
+        SimpleMatrix rGamma = new SimpleMatrix(new double[][] {{cos(vars[2]), -sin(vars[2]), 0}, {sin(vars[2]), cos(vars[2]), 0}, {0, 0, 1}});
         for (int i = 0; i < imgPts.size(); i++) {
-            SimpleMatrix rotImgPt = rBeta.mult(imgPts.get(i));
-            error[i] = atan(rotImgPt.get(3) / sqrt(rotImgPt.get(1) * rotImgPt.get(1) + rotImgPt.get(2) * rotImgPt.get(2)))
+            SimpleMatrix rotImgPt = rBeta.mult(rGamma.mult(imgPts.get(i)));
+            error[i] = atan(rotImgPt.get(2) / sqrt(rotImgPt.get(0) * rotImgPt.get(0) + rotImgPt.get(1) * rotImgPt.get(1)))
                      + atan((vars[0] - hs.get(i)) / ds.get(i));
         }
         return error;
     }
     public double[][] jac(double[] vars) {
         double[] er = error(vars);
-        double[] er1 = error(new double[] {vars[0] + EPS, vars[1]});
-        double[] er2 = error(new double[] {vars[0], vars[1] + EPS});
-        double[][] jac = new double[imgPts.size()][2];
+        double[] er1 = error(new double[] {vars[0] + 1e-6, vars[1], vars[2]});
+        double[] er2 = error(new double[] {vars[0], vars[1] + 1e-6, vars[2]});
+        double[] er3 = error(new double[] {vars[0], vars[1], vars[2] + 1e-6});
+        double[][] jac = new double[imgPts.size()][3];
         for (int i = 0; i < imgPts.size(); i++) {
-            jac[i][1] = (er1[i] - er[i]) / EPS;
-            jac[i][2] = (er2[i] - er[i]) / EPS;
+            jac[i][0] = (er1[i] - er[i]) / 1e-6;
+            jac[i][1] = (er2[i] - er[i]) / 1e-6;
+            jac[i][2] = (er3[i] - er[i]) / 1e-6;
         }
         return jac;
     }

@@ -71,9 +71,8 @@ public class ThreeWheelLocalizer implements Localizer {
                 exp.set(1, 1, sin(dA) / dA);
             }
             SimpleMatrix dPos = rot.mult(exp.mult(local));
-            SimpleMatrix nVel = rot.mult(local).scale(1 / dt);
             pos = new Pose(pos.x + dPos.get(0, 0), pos.y + dPos.get(1, 0), pos.h + dPos.get(2, 0));
-            vel = new Pose(nVel.get(0, 0), nVel.get(1, 0), nVel.get(2, 0));
+            vel = new Pose(rot.mult(local).scale(1 / dt));
         }
         lastTime = time;
         last1 = p1;
